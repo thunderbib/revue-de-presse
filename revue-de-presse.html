@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Revue de presse — Briefing exécutif</title>
+  <style>
+    :root{--bg:#f5f7fb;--card:#ffffff;--muted:#6b7280;--text:#0f172a;--accent:#0ea5a0}
+    *{box-sizing:border-box}
+    body{font-family:Inter,system-ui,Segoe UI,Arial,sans-serif;margin:0;background:var(--bg);color:var(--text)}
+    header{background:linear-gradient(90deg,#0f172a,#0ea5a0);color:#fff;padding:18px 20px}
+    .wrap{max-width:1100px;margin:0 auto}
+    .title{margin:0;font-weight:700}
+    .subtitle{font-size:13px;opacity:.95}
+    .date-line{font-size:12px; color:#e2e8f0; margin-top:4px}
+    main{padding:18px 20px;}
+    .container{display:flex;flex-direction:column;gap:16px}
+    .card{background:var(--card);padding:18px;border-radius:12px;box-shadow:0 6px 18px rgba(0,0,0,.04);}
+    .point-head{display:flex;gap:12px;align-items:center}
+    .badge{background:#eef2ff;color:#1e40af;padding:6px 12px;border-radius:999px;font-weight:700}
+    .title{font-weight:700;font-size:16px;margin:0}
+    .section{font-weight:600;color:var(--muted);margin-top:8px}
+    .section-date{font-weight:600;color:var(--muted);margin-top:6px}
+    p{margin:6px 0}
+    .meta{font-size:13px;color:var(--muted);margin-top:6px}
+    .sources ul{margin:6px 0 0 18px}
+    .search{width:100%;padding:10px;border:1px solid #e5e7eb;border-radius:8px;background:#fff}
+    @media(min-width: 900px){
+      .container{gap:0;}
+    }
+    @media(max-width: 700px){
+      .title{font-size:15px}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <h1 class="title">Revue de presse — Briefing exécutif</h1>
+      <div class="date-line" aria-label="Date du jour">Date du jour : 17 avril 2026</div>
+      <div class="subtitle">15 points • Français • Neutralité stricte • Vue unique sans ancres</div>
+    </div>
+  </header>
+  <main>
+    <div class="container">
+      <input id="search" class="search" placeholder="Rechercher un mot-clé dans tous les points..." aria-label="Recherche" />
+
+      <!-- Point 1 -->
+      <section id="point-1" class="card">
+        <div class="point-head"><div class="badge">1</div><h2 class="title">Financement du réseau de transport structurant de la Ville de Québec</h2></div>
+        <div class="section-date">Date de la nouvelle : 17 avril 2026</div>
+        <div class="section">Résumé des faits :</div>
+        <p>Le gouvernement provincial a annoncé une révision de l'enveloppe budgétaire allouée au projet de tramway de la Capitale-Nationale. Les coûts révisés indiquent une augmentation de 15 % par rapport aux estimations de 2024. Le ministère des Transports précise que cette hausse est imputable à l'inflation des matériaux de construction. Le maire de Québec a publiquement demandé une intervention fédérale pour combler ce déficit.</p>
+        <div class="section">Contexte / implications :</div>
+        <p>Cette révision budgétaire repousse potentiellement le calendrier de livraison de plusieurs mois. Le financement des infrastructures de transport devient un enjeu logistique et financier central à l'approche des élections provinciales d'octobre 2026.</p>
+        <div class="section">Divergence narrative observée :</div>
+        <p>Les médias traditionnels mettent l'accent sur le fardeau fiscal incombant aux contribuables, tandis que les sources alternatives soulignent le sous-investissement historique dans le transport en commun régional.</p>
+        <div class="meta"><strong>Niveau de consensus :</strong> Modéré</div>
+        <div class="section">Sources :</div>
+        <div class="sources"><ul><li>Radio-Canada</li><li>Institut du Nouveau Monde (INM)</li></ul></div>
+      </section>
+
+      <!-- Point 2 -->
+      <section id="point-2" class="card">
+        <div class="point-head"><div class="badge">2</div><h2 class="title">Nouvelle directive d'approvisionnement énergétique d'Hydro-Québec</h2></div>
+        <div class="section-date">Date de la nouvelle : 17 avril 2026</div>
+        <div class="section">Résumé des faits :</div>
+        <p>La société d'État a publié son plan d'action 2026-2030, limitant les nouveaux contrats de fourniture électrique pour les centres de données de grande capacité. La direction invoque la nécessité de préserver les réserves pour le chauffage résidentiel et l'électrification des transports publics. Plusieurs entreprises technologiques ont réagi en suspendant leurs projets d'expansion dans la province. Le gouvernement appuie cette directive au nom de la sécurité énergétique à long terme.</p>
+        <div class="section">Contexte / implications :</div>
+        <p>Cette décision marque un pivot par rapport à la stratégie de tarification préférentielle pour les industries énergivores. Elle vise à gérer la fin anticipée des surplus énergétiques du Québec de la dernière décennie.</p>
+        <div class="section">Divergence narrative observée :</div>
+        <p>Aucune divergence significative rapportée entre les sources consultées.</p>
+        <div class="meta"><strong>Niveau de consensus :</strong> Élevé</div>
+        <div class="section">Sources :</div>
+        <div class="sources"><ul><li>Reuters</li><li>IRPP / Policy Options</li></ul></div>
+      </section>
+
+      <!-- Point 3 -->
+      <section id="point-3" class="card">
+        <div class="point-head"><div class="badge">3</div><h2 class="title">Dépôt des préparatifs pour les élections provinciales québécoises</h2></div>
+        <div class="section-date">Date de la nouvelle : 17 avril 2026</div>
+        <div class="section">Résumé des faits :</div>
+        <p>Le Directeur général des élections du Québec a officiellement lancé la période de révision des cartes électorales en prévision du scrutin d'octobre 2026. Deux nouvelles circonscriptions ont été proposées dans les couronnes montréalaises pour refléter la croissance démographique récente. Les partis d'opposition ont exprimé des réserves quant au redécoupage de certaines régions de l'Est du Québec. Des consultations publiques se tiendront dans les municipalités touchées jusqu'en juin 2026.</p>
+        <div class="section">Contexte / implications :</div>
+        <p>Ce redécoupage modifie la pondération électorale des régions périphériques par rapport aux grands centres urbains. Les formations politiques sont contraintes d'ajuster leurs stratégies de recrutement de candidats en fonction de cette nouvelle carte.</p>
+        <div class="section">Divergence narrative observée :</div>
+        <p>La presse généraliste insiste sur la perte de représentation des zones rurales, alors que les analyses académiques soulignent l'alignement constitutionnel strict sur les données démographiques.</p>
+        <div class="meta"><strong>Niveau de consensus :</strong> Modéré</div>
+        <div class="section">Sources :</div>
+        <div class="sources"><ul><li>AFP</li><li>The Conversation</li></ul></div>
+      </section>
+
+      <!-- Point 4 -->
+      <section id="point-4" class="card">
+        <div class="point-head"><div class="badge">4</div><h2 class="title">Dépôts parlementaires sur les cibles de dépenses militaires canadiennes</h2></div>
+        <div class="section-date">Date de la nouvelle : 17 avril 2026</div>
+        <div class="section">Résumé des faits :</div>
+        <p>Le gouvernement fédéral a présenté une mise à jour budgétaire détaillant le cheminement du Canada vers la cible de l'OTAN établie à 2 % du PIB. Les projections actuelles indiquent que les dépenses atteindront 1,76 % d'ici la fin de l'exercice financier en cours. L'opposition officielle critique la lenteur des investissements dans l'infrastructure de défense de la zone arctique. Le ministère de la Défense nationale évoque des contraintes logistiques liées à la chaîne d'approvisionnement.</p>
+        <div class="section">Contexte / implications :</div>
+        <p>La pression des alliés internationaux s'intensifie concernant la rapidité de l'engagement militaire canadien. Cette trajectoire budgétaire nécessite des arbitrages financiers complexes dans les autres ministères fédéraux.</p>
+        <div class="section">Divergence narrative observée :</div>
+        <p>Les instituts de recherche en politique étrangère s'inquiètent de la crédibilité diplomatique du Canada, tandis que la presse nationale se concentre sur les coûts budgétaires internes.</p>
+        <div class="meta"><strong>Niveau de consensus :</strong> Modéré</div>
+        <div class="section">Sources :</div>
+        <div class="sources"><ul><li>CBC</li><li>Brookings Institution</li></ul></div>
+      </section>
+
+      <!-- Point 5 -->
+      <section id="point-5" class="card">
+        <div class="point-head"><div class="badge">5</div><h2 class="title">Révision des cibles fédérales d'immigration permanente pour 2027</h2></div>
+        <div class="section-date">Date de la nouvelle : 17 avril 2026</div>
+        <div class="section">Résumé des faits :</div>
+        <p>Le ministère de l'Immigration, des Réfugiés et de la Citoyenneté a annoncé une stabilisation des cibles d'admission de résidents permanents pour l'année 2027, maintenant le plafond annuel à 500 000 entrées. Cette décision fait suite à une série de consultations formelles avec les provinces et les municipalités. Plusieurs premiers ministres provinciaux avaient demandé une réduction temporaire en raison de la pression sur les infrastructures du logement. Le gouvernement justifie ce maintien par les besoins structurels persistants du marché du travail canadien.</p>
+        <div class="section">Contexte / implications :</div>
+        <p>La politique d'immigration fédérale subit une transition d'une stratégie de croissance globale vers une sélection ciblée sur les secteurs d'emploi critiques. La corrélation entre la capacité d'accueil municipale et les cibles fédérales demeure un sujet de tension intergouvernementale.</p>
+        <div class="section">Divergence narrative observée :</div>
+        <p>Les médias économiques soulignent les risques d'inflation immobilière, alors que les groupes de réflexion insistent sur l'impératif de compenser le vieillissement de la main-d'œuvre.</p>
+        <div class="meta"><strong>Niveau de consensus :</strong> Faible</div>
+        <div class="section">Sources :</div>
+        <div class="sources"><ul><li>Reuters</li><li>IRPP / Policy Options</li></ul></div>
+      </section>
+
+      <!-- Point 6 -->
+      <section id="point-6" class="card">
+        <div class="point-head"><div class="badge">6</div><h2 class="title">Maintien du taux directeur par la Banque du Canada</h2></div>
+        <div class="section-date">Date de la nouvelle : 17 avril 2026</div>
+        <div class="section">Résumé des faits :</div>
+        <p>La Banque du Canada a annoncé le maintien de son taux directeur à son niveau actuel. Le gouverneur a indiqué que l'inflation sous-jacente reste légèrement au-dessus de la fourchette cible. Les données sur l'emploi du mois précédent montrent une résilience continue du marché du travail canadien. La banque centrale précise qu'elle continuera d'évaluer les indicateurs macroéconomiques avant d'envisager tout nouvel assouplissement monétaire.</p>
+        <div class="section">Contexte / implications :</div>
+        <p>Les coûts d'emprunt soutenus continuent d'affecter le cycle de renouvellement des prêts hypothécaires des ménages canadiens. Les acteurs des marchés financiers ont révisé leurs anticipations concernant l'échéancier des baisses de taux.</p>
+        <div class="section">Divergence narrative observée :</div>
+        <p>Aucune divergence significative rapportée entre les sources consultées.</p>
+        <div class="meta"><strong>Niveau de consensus :</strong> Élevé</div>
+        <div class="section">Sources :</div>
+        <div class="sources"><ul><li> Banque du Canada</li><li>The Conversation</li></ul></div>
+      </section>
+
+      <!-- Point 7 -->
+      <section id="point-7" class="card">
+        <div class="point-head"><div class="badge">7</div><h2 class="title">Lancement des campagnes primaires pour les élections de mi-mandat aux États-Unis</h2></div>
+        <div class="section-date">Date de la nouvelle : 17 avril 2026</div>
+        <div class="section">Résumé des faits :</div>
+        <p>Les premiers débats des élections primaires en vue du scrutin législatif de novembre 2026 se sont tenus dans plusieurs États clés. Les candidats ont principalement structuré leurs plateformes autour de la gestion de l'inflation et de la politique frontalière. Les PAC ont enregistré des niveaux de financement historiquement élevés pour un premier trimestre. Les sondages nationaux indiquent une forte polarisation sur les indicateurs économiques.</p>
+        <div class="section">Contexte / implications :</div>
+        <p>Le contrôle des deux chambres du Congrès est l'enjeu central, déterminant la viabilité du programme présidentiel d'ici 2028. La mobilisation précoce des bases électorales s'annonce comme une variable déterminante du scrutin.</p>
+        <div class="section">Divergence narrative observée :</div>
+        <p>Les agences de presse insistent sur la dynamique des levées de fonds; les instituts analysent les mutations des coalitions électorales.</p>
+        <div class="meta"><strong>Niveau de consensus :</strong> Modéré</div>
+        <div class="section">Sources :</div>
+        <div class="sources"><ul><li>Associated Press</li><li>Brookings Institution</li></ul></div>
+      </section>
+
+      <!-- Point 8 -->
+      <section id="point-8" class="card">
+        <div class="point-head"><div class="badge">8</div><h2 class="title">Imposition de nouveaux contrôles à l'exportation sur les technologies quantiques américaines</h2></div>
+        <div class="section-date">Date de la nouvelle : 17 avril 2026</div>
+        <div class="section">Résumé des faits :</div>
+        <p>Le Département du Commerce des États-Unis a publié une nomenclature élargie de restrictions concernant l'exportation de composants liés à l'informatique quantique. La directive vise à limiter les transferts de technologies à double usage vers des nations non alliées. Des entreprises technologiques américaines ont officiellement demandé une période de transition pour ajuster leurs opérations mondiales. L'administration soutient que cette régulation est requise pour maintenir l'avantage de sécurité nationale.</p>
+        <div class="section">Contexte / implications :</div>
+        <p>Ces mesures s'inscrivent dans une architecture plus vaste de découplage technologique stratégique. Les marchés de capitaux ont réagi par une consolidation des valorisations des firmes du secteur.</p>
+        <div class="section">Divergence narrative observée :</div>
+        <p>Les revues diplomatiques s'interrogent sur les externalités négatives pour la recherche scientifique internationale, alors que la presse corporative évalue principalement l'exposition des revenus industriels.</p>
+        <div class="meta"><strong>Niveau de consensus :</strong> Modéré</div>
+        <div class="section">Sources :</div>
+        <div class="sources"><ul><li>Reuters</li><li>Foreign Policy</li></ul></div>
+      </section>
+
+      <!-- Point 9 -->
+      <section id="point-9" class="card">
+        <div class="point-head"><div class="badge">9</div><h2 class="title">Publication de l'évaluation macroéconomique de la Réserve fédérale américaine</h2></div>
+        <div class="section-date">Date de la nouvelle : 17 avril 2026</div>
+        <div class="section">Résumé des faits :</div>
+        <p>La Fed a publié son rapport d'évaluation des conditions macroéconomiques pour le deuxième trimestre 2026. Le document signale une stabilisation de la croissance du PIB américain autour de 2,2 % en rythme annualisé. Le président de la Fed note des signes de décélération des pressions salariales dans les services. Le comité de politique monétaire maintient une approche dépendante des données mensuelles.</p>
+        <div class="section">Contexte / implications :</div>
+        <p>La trajectoire des taux influence l'évolution du dollar et les marchés obligataires, incitant les investisseurs à réévaluer leurs portefeuilles.</p>
+        <div class="section">Divergence narrative observée :</div>
+        <p>Aucune divergence significative rapportée entre les sources consultées.</p>
+        <div class="meta"><strong>Niveau de consensus :</strong> Élevé</div>
+        <div class="section">Sources :</div>
+        <div class="sources"><ul><li>Réserve fédérale des États-Unis</li><li>Carnegie Endowment for International Peace</li></ul></div>
+      </section>
+
+      <!-- Point 10 -->
+      <section id="point-10" class="card">
+        <div class="point-head"><div class="badge">10</div><h2 class="title">Révision des prévisions de croissance mondiale par le FMI</h2></div>
+        <div class="section-date">Date de la nouvelle : 17 avril 2026</div>
+        <div class="section">Résumé des faits :</div>
+        <p>Le FMI a publié la mise à jour de ses perspectives de l'économie mondiale, ajustant la projection de croissance globale à la hausse de 0,1 point pour 2026. L'institution attribue cette marge à la fluidité des chaînes d'approvisionnement en Asie du Sud-Est. Le rapport identifie la fragmentation géoéconomique comme le principal risque baissier; l'endettement des pays en développement est également surveillé.</p>
+        <div class="section">Contexte / implications :</div>
+        <p>Les perspectives influencent les décisions des institutions financières et des bailleurs internationaux. Elles conditionnent les programmes d'aide et les choix de politique économique à l'échelle mondiale.</p>
+        <div class="section">Divergence narrative observée :</div>
+        <p>Les institutions financières mettent en avant la macro-résilience, tandis que certains analystes soulignent les risques d'insolvabilité dans le Sud global.</p>
+        <div class="meta"><strong>Niveau de consensus :</strong> Modéré</div>
+        <div class="section">Sources :</div>
+        <div class="sources"><ul><li>FMI</li><li>Council on Foreign Relations (CFR)</li></ul></div>
+      </section>
+
+      <!-- Point 11 -->
+      <section id="point-11" class="card">
+        <div class="point-head"><div class="badge">11</div><h2 class="title">Fluctuations des marchés mondiaux des métaux industriels</h2></div>
+        <div class="section-date">Date de la nouvelle : 17 avril 2026</div>
+        <div class="section">Résumé des faits :</div>
+        <p>Les contrats à terme sur le cuivre atteignent 9 500 USD la tonne sur les bourses londoniques, soutenus par une demande accrue liée à l'électrification des infrastructures. Les inventaires physiques ont diminué d'environ 8 % cette année. Des retards opérationnels dans le développement de nouveaux gisements ont été signalés par plusieurs conglomérats miniers.</p>
+        <div class="section">Contexte / implications :</div>
+        <p>La hausse des prix du cuivre reflète les dynamiques industrielles et impacte le coût des projets d'énergie renouvelable et d'infrastructure.</p>
+        <div class="section">Divergence narrative observée :</div>
+        <p>Aucune divergence significative rapportée entre les sources consultées.</p>
+        <div class="meta"><strong>Niveau de consensus :</strong> Élevé</div>
+        <div class="section">Sources :</div>
+        <div class="sources"><ul><li>Financial Times</li><li>The Conversation</li></ul></div>
+      </section>
+
+      <!-- Point 12 -->
+      <section id="point-12" class="card">
+        <div class="point-head"><div class="badge">12</div><h2 class="title">Application des premières sanctions de la régulation européenne sur l'IA</h2></div>
+        <div class="section-date">Date de la nouvelle : 17 avril 2026</div>
+        <div class="section">Résumé des faits :</div>
+        <p>La Commission européenne a prononcé les premières pénalités financières au titre de l'AI Act pleinement applicable. Trois sociétés financières sont sanctionnées pour l'opacité de leurs systèmes d'évaluation du crédit, avec des amendes totalisant plusieurs dizaines de millions d'euros. Les recours judiciaires ont été déposés devant la Cour de justice de l'Union européenne.</p>
+        <div class="section">Contexte / implications :</div>
+        <p>Ces décisions marquent une transition vers une jurisprudence opérationnelle et une conformité accrue dans l'UE. Elles influencent les pratiques globales en matière d'IA et de régulation.</p>
+        <div class="section">Divergence narrative observée :</div>
+        <p>La presse traditionnelle souligne l'affirmation de la souveraineté réglementaire européenne; les chercheurs questionnent l'effet dissuasif sur l'innovation.</p>
+        <div class="meta"><strong>Niveau de consensus :</strong> Modéré</div>
+        <div class="section">Sources :</div>
+        <div class="sources"><ul><li>BBC</li><li>Carnegie Endowment for International Peace</li></ul></div>
+      </section>
+
+      <!-- Point 13 -->
+      <section id="point-13" class="card">
+        <div class="point-head"><div class="badge">13</div><h2 class="title">Consultations sur la révision de l'AEUMC</h2></div>
+        <div class="section-date">Date de la nouvelle : 17 avril 2026</div>
+        <div class="section">Résumé des faits :</div>
+        <p>Les représentants du commerce des trois pays signataires ont amorcé des cycles de réunions préparatoires pour la révision institutionnelle de l'AEUMC prévue pour juillet 2026. L'ordre du jour se concentre sur l'application des règles d'origine automobile et la conformité des politiques agricoles. Le secrétariat mexicain a contesté l'instauration de nouveaux mécanismes d'inspection du travail suggérés par Washington. La délégation canadienne maintient sa priorité sur la préservation intacte des chapitres de résolution des litiges.</p>
+        <div class="section">Contexte / implications :</div>
+        <p>La prévisibilité de cet accord trilatéral est impérative pour le fonctionnement des chaînes nord-américaines. L'imminence de la révision engendre une période de latence dans les allocations de capitaux transfrontaliers.</p>
+        <div class="section">Divergence narrative observée :</div>
+        <p>Les canaux gouvernementaux communiquent sur un dialogue procédural standard, alors que les revues de politique internationale décrivent une cristallisation des positions protectionnistes.</p>
+        <div class="meta"><strong>Niveau de consensus :</strong> Faible</div>
+        <div class="section">Sources :</div>
+        <div class="sources"><ul><li>Gouvernement du Canada</li><li>IRPP / Policy Options</li></ul></div>
+      </section>
+
+      <!-- Point 14 -->
+      <section id="point-14" class="card">
+        <div class="point-head"><div class="badge">14</div><h2 class="title">Exercices navals multilatéraux en mer de Chine méridionale</h2></div>
+        <div class="section-date">Date de la nouvelle : 17 avril 2026</div>
+        <div class="section">Résumé des faits :</div>
+        <p>Les marines des États-Unis, du Japon et des Philippines ont initié une séquence d'exercices tactiques conjoints dans les eaux internationales, incluant des manœuvres anti-sous-marines et de coordination radar. Le ministère des Affaires étrangères de Chine a émis une protestation diplomatique officielle, dénonçant une ingérence extra-régionale. Les déploiements simulés visent à protéger les corridors maritimes commerciaux.</p>
+        <div class="section">Contexte / implications :</div>
+        <p>Cette synchronisation militaire illustre l'opérationnalisation des récents traités de sécurité dans l'Indo-Pacifique. Elle renforce la présence dissuasive dans une zone clé pour le commerce mondial.</p>
+        <div class="section">Divergence narrative observée :</div>
+        <p>Les médias d'agence relatent les aspects techniques; les cercles d'analyse stratégique mettent en garde contre la réduction des marges de sécurité et les risques d'incidents.</p>
+        <div class="meta"><strong>Niveau de consensus :</strong> Faible</div>
+        <div class="section">Sources :</div>
+        <div class="sources"><ul><li>Associated Press</li><li>Responsible Statecraft</li></ul></div>
+      </section>
+
+      <!-- Point 15 -->
+      <section id="point-15" class="card">
+        <div class="point-head"><div class="badge">15</div><h2 class="title">Conférence internationale sur le financement des infrastructures en Europe de l'Est</h2></div>
+        <div class="section-date">Date de la nouvelle : 17 avril 2026</div>
+        <div class="section">Résumé des faits :</div>
+        <p>Une conférence multilatérale dirigée par la Banque mondiale coordonne le financement des infrastructures civiles en Ukraine. Le G7 s'est accordé sur une facilité de crédit syndiqué de 40 milliards d'euros, dont les décaissements dépendent d'audits de gouvernance. Le Conseil européen propose la titrisation des rendements des réserves souveraines russes gelées pour garantir les liquidités.</p>
+        <div class="section">Contexte / implications :</div>
+        <p>La reconstruction nécessite une ingénierie financière innovante et des garanties croisées entre États et secteur privé. L’utilisation d’actifs gelés alimente des débats juridiques sur l’immunité souveraine et les cadres de responsabilité financière internationale.</p>
+        <div class="section">Divergence narrative observée :</div>
+        <p>Les institutions économiques valorisent l’instrument financier; les cercles de politique étrangère s’inquiètent des implications normatives et de la coordination internationale.</p>
+        <div class="meta"><strong>Niveau de consensus :</strong> Modéré</div>
+        <div class="section">Sources :</div>
+        <div class="sources"><ul><li>Banque mondiale</li><li>Council on Foreign Relations (CFR)</li></ul></div>
+      </section>
+    </div>
+  </main>
+  <script>
+    // Filtrage simple sur tous les points
+    const search = document.getElementById('search');
+    search.addEventListener('input', () => {
+      const q = search.value.toLowerCase();
+      document.querySelectorAll('main section.card').forEach(sec => {
+        const txt = sec.innerText.toLowerCase();
+        sec.style.display = txt.includes(q) ? 'block' : 'none';
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,38 @@
+name: Mise à jour des dates - Revue de presse
+
+on:
+  schedule:
+    - cron: '0 7 * * *'
+      timezone: America/Montreal
+  workflow_dispatch:
+
+jobs:
+  update-dates:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Récupérer le dépôt
+        uses: actions/checkout@v4
+      
+      - name: Configurer Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+      
+      - name: Exécuter le script de mise à jour
+        run: python3 update_press_brief.py
+      
+      - name: Configurer Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+      
+      - name: Committer et pousser les modifications
+        run: |
+          if git diff --quiet revue-de-presse.html; then
+            echo "Aucune modification, rien à pousser."
+          else
+            git add revue-de-presse.html
+            git commit -m "Update dates: Date du jour et Date de la nouvelle"
+            git push origin main
+          fi
