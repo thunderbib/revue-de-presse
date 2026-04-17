@@ -1,0 +1,5 @@
+{
+    "github-actions.workflows.pinned.workflows": [
+        ".github/workflows/update_press_brief.yml"
+    ]
+}
