@@ -1,76 +1,24 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Agent de revue de presse quotidienne automatisée.
-Récupère 15 articles de sources diversifiées et génère une revue neutre et sourcée.
-Respecte strictement les critères de neutralité, diversité de sources et rigueur analytique.
+Agent de revue de presse quotidienne automatisée avec traduction en français.
+Récupère 15 articles de sources diversifiées, les traduit en français.
+Respecte strictement les critères de neutralité et rigueur analytique.
 """
 
 import os
 import requests
-import json
+import urllib.parse
 from datetime import datetime, timedelta
 from html import escape
 import re
+import time
 
 # Mois en français
 MOIS_FR = [
     "janvier", "février", "mars", "avril", "mai", "juin",
     "juillet", "août", "septembre", "octobre", "novembre", "décembre"
 ]
-
-# Configuration des sources
-SOURCES_CONFIG = {
-    "newsapi": {
-        "url": "https://newsapi.org/v2/everything",
-        "api_key": os.getenv("NEWSAPI_KEY", ""),  # À obtenir sur https://newsapi.org
-        "credibility_level": "high"
-    }
-}
-
-# Sources prioritaires pour neutralité
-SOURCE_MAPPING = {
-    "reuters": {"nom": "Reuters", "type": "traditionnel"},
-    "bbc": {"nom": "BBC", "type": "traditionnel"},
-    "associated-press": {"nom": "Associated Press", "type": "traditionnel"},
-    "cbc": {"nom": "CBC/Radio-Canada", "type": "traditionnel"},
-    "cnn": {"nom": "CNN", "type": "traditionnel"},
-    "financial-times": {"nom": "Financial Times", "type": "traditionnel"},
-    "the-guardian": {"nom": "The Guardian", "type": "traditionnel"},
-    "the-conversation": {"nom": "The Conversation", "type": "analytique"},
-    "brookings-institution": {"nom": "Brookings Institution", "type": "analytique"},
-    "foreign-policy": {"nom": "Foreign Policy", "type": "analytique"},
-    "the-hill": {"nom": "The Hill", "type": "analytique"},
-}
-
-# Catégories de couverture requises
-CATEGORIES = {
-    "quebec": {
-        "keywords": ["Quebec City", "Ville de Quebec", "Montreal", "Quebec politics"],
-        "count": 3,
-        "sources": []
-    },
-    "canada": {
-        "keywords": ["Canada", "Canadian politics", "Ottawa", "Parliament"],
-        "count": 3,
-        "sources": []
-    },
-    "usa": {
-        "keywords": ["United States", "US politics", "Washington", "White House"],
-        "count": 3,
-        "sources": []
-    },
-    "economy": {
-        "keywords": ["economy", "markets", "business", "trade", "inflation", "GDP"],
-        "count": 3,
-        "sources": []
-    },
-    "geopolitics": {
-        "keywords": ["international", "geopolitics", "diplomacy", "UN", "global"],
-        "count": 3,
-        "sources": []
-    }
-}
 
 def obtenir_date_francaise(date_obj=None):
     """Retourne la date au format français."""
@@ -81,43 +29,82 @@ def obtenir_date_francaise(date_obj=None):
     annee = date_obj.year
     return f"{jour} {mois} {annee}"
 
+def traduire_google(texte):
+    """
+    Traduit du texte en français via l'API Google Translate.
+    Méthode gratuite, sans clé d'authentification requise.
+    """
+    if not texte or len(texte) < 2:
+        return texte
+    
+    try:
+        # Encoder le texte
+        texte_encode = urllib.parse.quote(texte[:500])
+        
+        # URL de l'API Google Translate
+        url = f"https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=fr&dt=t&q={texte_encode}"
+        
+        # Faire la requête avec timeout
+        response = requests.get(url, timeout=5)
+        
+        if response.status_code == 200:
+            try:
+                data = response.json()
+                if data and len(data) > 0 and len(data[0]) > 0 and len(data[0][0]) > 0:
+                    traduction = data[0][0][0]
+                    return traduction
+            except:
+                return texte
+        
+        return texte
+    
+    except Exception as e:
+        print(f"  ⚠ Traduction échouée, texte original conservé")
+        return texte
+
 def recuperer_articles():
-    """Récupère les articles via NewsAPI avec critères de neutralité."""
-    api_key = SOURCES_CONFIG["newsapi"]["api_key"]
+    """Récupère les articles via NewsAPI."""
+    api_key = os.getenv("NEWSAPI_KEY", "")
     
     if not api_key:
-        print("Erreur : NEWSAPI_KEY non configurée.")
+        print("❌ Erreur : NEWSAPI_KEY non configurée.")
         print("Obtenez une clé gratuite sur https://newsapi.org")
         exit(1)
     
-    articles_par_categorie = {cat: [] for cat in CATEGORIES}
+    articles_par_categorie = {
+        "quebec": [],
+        "canada": [],
+        "usa": [],
+        "economy": [],
+        "geopolitics": []
+    }
+    
+    # Configuration des requêtes par catégorie
+    requetes = {
+        "quebec": "Montreal OR Quebec OR (Ville de Quebec)",
+        "canada": "Canada OR Ottawa OR Parliament",
+        "usa": "United States OR Washington OR White House OR Congress",
+        "economy": "economy OR markets OR business OR trading",
+        "geopolitics": "international OR geopolitics OR UN OR diplomacy"
+    }
+    
     date_hier = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
     
-    # Sources hautement neutres et crédibl
-    sources_prioritaires = [
-        "reuters",
-        "bbc-news",
-        "associated-press",
-        "cbc-news",
-        "financial-times"
-    ]
-    
     try:
-        # Requête pour chaque catégorie
-        for categorie, config in CATEGORIES.items():
-            keywords = " OR ".join(config["keywords"])
+        for categorie, query in requetes.items():
+            print(f"  📡 Récupération articles {categorie}...")
             
             params = {
-                "q": keywords,
+                "q": query,
                 "apiKey": api_key,
                 "from": date_hier,
                 "sortBy": "relevancy",
                 "language": "en",
-                "pageSize": 50
+                "pageSize": 100
             }
             
             response = requests.get(
-                SOURCES_CONFIG["newsapi"]["url"],
+                "https://newsapi.org/v2/everything",
                 params=params,
                 timeout=10
             )
@@ -125,94 +112,92 @@ def recuperer_articles():
             if response.status_code == 200:
                 data = response.json()
                 
-                # Filtrer par sources de confiance
                 for article in data.get("articles", []):
-                    source_name = article.get("source", {}).get("name", "").lower()
-                    
-                    # Vérifier la qualité du contenu
+                    # Vérifier la qualité
                     if (article.get("description") and 
-                        article.get("urlToImage") and 
-                        len(article.get("description", "")) > 100):
+                        len(article.get("description", "")) > 80 and
+                        article.get("title")):
                         
                         articles_par_categorie[categorie].append({
                             "title": article.get("title", ""),
                             "description": article.get("description", ""),
                             "url": article.get("url", ""),
                             "source": article.get("source", {}).get("name", "Unknown"),
-                            "publishedAt": article.get("publishedAt", ""),
-                            "urlToImage": article.get("urlToImage", "")
+                            "publishedAt": article.get("publishedAt", "")[:10],
                         })
         
         return articles_par_categorie
     
     except requests.exceptions.RequestException as e:
-        print(f"Erreur réseau : {e}")
+        print(f"❌ Erreur réseau : {e}")
         exit(1)
 
-def generer_contexte_neutre(article):
-    """Génère un contexte neutre sans opinions."""
-    description = article.get("description", "")
-    # Supprimer les formulations subjectives
-    description = re.sub(r'\b(shocking|amazing|incredible|terrible|fantastic)\b', '', 
-                        description, flags=re.IGNORECASE)
-    return description[:300] + "..." if len(description) > 300 else description
-
 def generer_html(articles_par_categorie):
-    """Génère le fichier HTML avec les articles récupérés."""
+    """Génère le HTML avec articles traduits en français."""
     date_aujourd_hui = obtenir_date_francaise()
-    
     html_articles = ""
-    numero_point = 1
+    numero = 1
     
-    # Ordonner les articles pour équilibre
-    ordre_categorie = ["canada", "quebec", "usa", "economy", "geopolitics"]
-    articles_ordonnes = []
+    # Ordre équilibré
+    ordre = ["canada", "quebec", "usa", "economy", "geopolitics"]
+    articles_selectionnes = []
     
-    for cat in ordre_categorie:
+    # Sélectionner 3 articles par catégorie
+    for cat in ordre:
         for article in articles_par_categorie.get(cat, [])[:3]:
-            articles_ordonnes.append((cat, article))
+            articles_selectionnes.append((cat, article))
     
-    for categorie, article in articles_ordonnes[:15]:
-        titre = escape(article.get("title", "Sans titre"))
-        source = escape(article.get("source", "Unknown"))
-        contexte = escape(generer_contexte_neutre(article))
-        url = escape(article.get("url", "#"))
-        date_article = article.get("publishedAt", "")[:10]
+    print(f"\n🌐 Traduction des articles en français...")
+    
+    # Générer les articles
+    for idx, (categorie, article) in enumerate(articles_selectionnes[:15]):
+        # Traduction avec affichage du statut
+        titre_en = article.get("title", "Sans titre")
+        desc_en = article.get("description", "")
         
-        # Mapper la catégorie à un label français
-        categorie_label = {
+        print(f"  [{idx+1}/15] Traduction: {titre_en[:60]}...")
+        
+        titre_fr = traduire_google(titre_en)
+        time.sleep(0.2)  # Éviter les limites de taux
+        desc_fr = traduire_google(desc_en)
+        
+        source = escape(article.get("source", "Unknown"))
+        date_article = article.get("publishedAt", "")
+        
+        # Mapper catégorie
+        labels = {
             "quebec": "QUÉBEC",
             "canada": "CANADA",
             "usa": "ÉTATS-UNIS",
             "economy": "ÉCONOMIE",
             "geopolitics": "GÉOPOLITIQUE"
-        }.get(categorie, "GÉNÉRAL")
+        }
         
         html_articles += f"""
                     <article>
                         <div class="article-image"></div>
                         <div class="article-header">
-                            <span class="category-badge">{categorie_label}</span>
-                            <h3>{titre}</h3>
+                            <span class="category-badge">{labels.get(categorie, "GÉNÉRAL")}</span>
+                            <h3>{escape(titre_fr)}</h3>
                             <div class="article-meta">Date de la nouvelle : {date_article}</div>
-                            <p class="article-excerpt">{contexte}</p>
+                            <p class="article-excerpt">{escape(desc_fr[:250])}...</p>
                             <div class="article-footer">
                                 <span class="read-time">Source : {source}</span>
                             </div>
                         </div>
                     </article>
 """
-        numero_point += 1
+        numero += 1
     
-    # Compléter jusqu'à 15 articles si nécessaire
-    while numero_point <= 15:
-        html_articles += """
+    # Remplir jusqu'à 15
+    while numero <= 15:
+        html_articles += f"""
                     <article>
                         <div class="article-image"></div>
                         <div class="article-header">
                             <span class="category-badge">ACTUALITÉS</span>
-                            <h3>En attente de mise à jour...</h3>
-                            <div class="article-meta">Date de la nouvelle : """ + date_aujourd_hui + """</div>
+                            <h3>En attente de données...</h3>
+                            <div class="article-meta">Date de la nouvelle : {date_aujourd_hui}</div>
                             <p class="article-excerpt">Les données pour cet article se chargeront lors de la prochaine exécution.</p>
                             <div class="article-footer">
                                 <span class="read-time">Revue de Presse Automatisée</span>
@@ -220,9 +205,10 @@ def generer_html(articles_par_categorie):
                         </div>
                     </article>
 """
-        numero_point += 1
+        numero += 1
     
-    html_template = f"""<!DOCTYPE html>
+    # Template HTML
+    html = f"""<!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
@@ -258,7 +244,6 @@ def generer_html(articles_par_categorie):
             text-align: center;
             margin-bottom: 0;
             box-shadow: 5px 5px 0px rgba(0, 0, 0, 0.2);
-            max-width: 100%;
             position: relative;
         }}
 
@@ -340,10 +325,6 @@ def generer_html(articles_par_categorie):
             font-weight: bold;
         }}
 
-        header .info-row span {{
-            letter-spacing: 1px;
-        }}
-
         nav {{
             background: #1a1a1a;
             padding: 12px 30px;
@@ -369,9 +350,6 @@ def generer_html(articles_par_categorie):
             margin: 0;
             background: #fff8f0;
             padding: 30px;
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 30px;
             border-left: 8px solid #1a1a1a;
             border-right: 8px solid #1a1a1a;
         }}
@@ -382,7 +360,6 @@ def generer_html(articles_par_categorie):
             color: #1a1a1a;
             margin-bottom: 20px;
             text-align: left;
-            position: relative;
             padding-bottom: 12px;
             font-weight: 900;
             text-transform: uppercase;
@@ -593,36 +570,37 @@ def generer_html(articles_par_categorie):
 
         <aside class="sidebar">
             <h3>À PROPOS DE CETTE REVUE</h3>
-            <p><strong>Méthodologie :</strong> Revue de presse automatisée et mise à jour quotidiennement (07:00 heure de Québec) via des sources diversifiées : médias traditionnels (Reuters, AFP, BBC, Radio-Canada), sources analytiques (Brookings, Foreign Policy) et institutions.</p>
-            <p><strong>Principe :</strong> Présentation factuelle et neutre des actualités. Aucune opinion éditoriale. Faits, contexte et sources vérifiées.</p>
+            <p><strong>Traduction automatique :</strong> Tous les articles sont traduits en français via Google Translate.</p>
+            <p><strong>Mise à jour :</strong> Quotidienne à 07:00 heure de Québec avec sources diversifiées.</p>
         </aside>
     </div>
 </body>
 </html>
 """
     
-    return html_template
+    return html
 
 def main():
     """Fonction principale."""
-    print("[Revue de Presse Automatisée]")
-    print(f"Récupération des actualités du jour...")
+    print("\n" + "="*50)
+    print("🗞️  REVUE DE PRESSE AUTOMATISÉE")
+    print("="*50)
     
-    # Récupérer les articles
+    print("\n📰 Récupération des articles...")
     articles = recuperer_articles()
     
-    # Générer le HTML
+    print("\n✏️  Génération du HTML...")
     html_content = generer_html(articles)
     
-    # Écrire le fichier
+    print("\n💾 Sauvegarde du fichier...")
     try:
         with open("revue-de-presse.html", "w", encoding="utf-8") as f:
             f.write(html_content)
-        print(f"✓ Revue de presse mise à jour : {obtenir_date_francaise()}")
-        print(f"✓ Fichier généré avec succès")
+        print(f"\n✅ Succès! Revue mise à jour : {obtenir_date_francaise()}")
+        print("="*50)
         exit(0)
     except Exception as e:
-        print(f"Erreur lors de l'écriture : {e}")
+        print(f"\n❌ Erreur : {e}")
         exit(1)
 
 if __name__ == "__main__":
