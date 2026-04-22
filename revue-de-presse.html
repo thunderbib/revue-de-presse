@@ -134,23 +134,14 @@
             border-bottom: 8px solid #333;
         }
 
-        nav a {
-            text-decoration: none;
+        nav span {
             color: #fff8f0;
             font-weight: bold;
             font-size: 0.9em;
-            transition: all 0.3s ease;
             text-transform: uppercase;
             letter-spacing: 2px;
             font-family: 'Courier Prime', monospace;
-            border: 2px solid transparent;
             padding: 4px 8px;
-        }
-
-        nav a:hover {
-            background: #fff8f0;
-            color: #1a1a1a;
-            border: 2px solid #fff8f0;
         }
 
         /* MAIN CONTAINER */
@@ -269,30 +260,6 @@
             font-size: 1.8em;
             font-weight: bold;
             margin-right: 2px;
-        }
-
-        .read-more {
-            display: inline-block;
-            background: #1a1a1a;
-            color: #fff8f0;
-            padding: 10px 20px;
-            text-decoration: none;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            width: fit-content;
-            font-family: 'Courier Prime', monospace;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            border: 3px solid #1a1a1a;
-            font-size: 0.85em;
-            margin-top: 15px;
-        }
-
-        .read-more:hover {
-            background: #fff8f0;
-            color: #1a1a1a;
-            transform: translate(2px, 2px);
-            box-shadow: -2px -2px 0px #1a1a1a;
         }
 
         /* ARTICLES GRID */
@@ -416,9 +383,6 @@
 
         article .article-footer {
             padding: 10px 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
             font-size: 0.8em;
         }
 
@@ -427,26 +391,6 @@
             font-style: italic;
             font-family: 'Courier Prime', monospace;
             font-weight: bold;
-        }
-
-        article .continue-link {
-            color: #1a1a1a;
-            text-decoration: none;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            display: inline-block;
-            font-family: 'Courier Prime', monospace;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-size: 0.8em;
-            border-bottom: 2px solid #1a1a1a;
-            padding-bottom: 2px;
-        }
-
-        article .continue-link:hover {
-            background: #1a1a1a;
-            color: #fff8f0;
-            padding: 2px 4px;
         }
 
         /* SIDEBAR */
@@ -538,30 +482,6 @@
             margin: 15px 0;
         }
 
-        footer .footer-links {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            flex-wrap: wrap;
-            margin-top: 12px;
-        }
-
-        footer a {
-            color: #fff8f0;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            font-size: 0.8em;
-            letter-spacing: 1px;
-            font-family: 'Courier Prime', monospace;
-            font-weight: bold;
-            border-bottom: 1px solid transparent;
-        }
-
-        footer a:hover {
-            border-bottom: 1px solid #fff8f0;
-        }
-
         /* RESPONSIVE */
         @media (max-width: 1200px) {
             .container {
@@ -624,7 +544,7 @@
                 padding: 10px 20px;
             }
 
-            nav a {
+            nav span {
                 font-size: 0.8em;
             }
 
@@ -679,11 +599,6 @@
                 font-size: 1em;
             }
 
-            .read-more {
-                padding: 8px 15px;
-                font-size: 0.75em;
-            }
-
             nav {
                 gap: 10px;
                 padding: 8px 15px;
@@ -715,6 +630,15 @@
         article:nth-child(4) { animation-delay: 0.3s; }
         article:nth-child(5) { animation-delay: 0.4s; }
         article:nth-child(6) { animation-delay: 0.5s; }
+        article:nth-child(7) { animation-delay: 0.6s; }
+        article:nth-child(8) { animation-delay: 0.7s; }
+        article:nth-child(9) { animation-delay: 0.8s; }
+        article:nth-child(10) { animation-delay: 0.9s; }
+        article:nth-child(11) { animation-delay: 1s; }
+        article:nth-child(12) { animation-delay: 1.1s; }
+        article:nth-child(13) { animation-delay: 1.2s; }
+        article:nth-child(14) { animation-delay: 1.3s; }
+        article:nth-child(15) { animation-delay: 1.4s; }
     </style>
 </head>
 <body>
@@ -734,11 +658,11 @@
     </header>
 
     <nav>
-        <a href="#technologie">Technologie</a>
-        <a href="#affaires">Affaires</a>
-        <a href="#sciences">Sciences</a>
-        <a href="#environnement">Environnement</a>
-        <a href="#societe">Société</a>
+        <span>TECHNOLOGIE</span>
+        <span>AFFAIRES</span>
+        <span>SCIENCES</span>
+        <span>ENVIRONNEMENT</span>
+        <span>SOCIÉTÉ</span>
     </nav>
 
     <div class="container">
@@ -747,12 +671,11 @@
             <section class="hero-section">
                 <div class="hero-image"></div>
                 <div class="hero-content">
-                    <span class="category" id="technologie">TECHNOLOGIE</span>
+                    <span class="category">TECHNOLOGIE</span>
                     <h2>L'Intelligence Artificielle Révolutionne Le Diagnostic Médical</h2>
                     <div class="article-date">Date de la nouvelle : 17 avril 2026</div>
                     <p>Une percée majeure dans le domaine de l'intelligence artificielle promet de transformer complètement le secteur médical. Des systèmes d'IA dernière génération sont maintenant capables d'analyser les images médicales avec une précision surhumaine, dépassant même les experts les plus chevronnés.</p>
                     <p>Les chercheurs rapportent que ces algorithmes peuvent identifier les tumeurs malignes, les fractures osseuses et les anomalies cardiovasculaires en moins de 5 secondes, réduisant considérablement le temps d'attente des patients et améliorant les taux de survie de 40% dans les essais cliniques initiaux.</p>
-                    <a href="#" class="read-more">Lire l'article complet</a>
                 </div>
             </section>
 
@@ -761,7 +684,7 @@
                 <h2>AUTRES NOUVELLES DU JOUR</h2>
 
                 <div class="articles-grid">
-                    <article id="affaires">
+                    <article>
                         <div class="article-image"></div>
                         <div class="article-header">
                             <span class="category-badge">ENVIRONNEMENT</span>
@@ -769,13 +692,12 @@
                             <div class="article-meta">Date de la nouvelle : 17 avril 2026</div>
                             <p class="article-excerpt">La province de Québec dévoile un plan ambitieux d'investissement de 8 milliards de dollars sur dix ans pour renforcer son infrastructure énergétique verte. Ce programme comprend le déploiement massif d'éoliennes, de panneaux solaires et de technologies révolutionnaires.</p>
                             <div class="article-footer">
-                                <span class="read-time">5 min</span>
-                                <a href="#" class="continue-link">Lire</a>
+                                <span class="read-time">5 min de lecture</span>
                             </div>
                         </div>
                     </article>
 
-                    <article id="societe">
+                    <article>
                         <div class="article-image"></div>
                         <div class="article-header">
                             <span class="category-badge">AFFAIRES</span>
@@ -783,13 +705,12 @@
                             <div class="article-meta">Date de la nouvelle : 17 avril 2026</div>
                             <p class="article-excerpt">Le secteur technologique du Québec connaît une croissance exponentielle avec un afflux record d'investissements étrangers. Les startups locales levaient 1.2 milliard de dollars en 2025, représentant une augmentation de 35%.</p>
                             <div class="article-footer">
-                                <span class="read-time">4 min</span>
-                                <a href="#" class="continue-link">Lire</a>
+                                <span class="read-time">4 min de lecture</span>
                             </div>
                         </div>
                     </article>
 
-                    <article id="sciences">
+                    <article>
                         <div class="article-image"></div>
                         <div class="article-header">
                             <span class="category-badge">SCIENCES</span>
@@ -797,8 +718,7 @@
                             <div class="article-meta">Date de la nouvelle : 17 avril 2026</div>
                             <p class="article-excerpt">Une équipe internationale de biologistes marins découvre une espèce de corail capable de survivre à des températures 5°C plus élevées que les espèces existantes. Une découverte promettante pour la préservation des récifs.</p>
                             <div class="article-footer">
-                                <span class="read-time">6 min</span>
-                                <a href="#" class="continue-link">Lire</a>
+                                <span class="read-time">6 min de lecture</span>
                             </div>
                         </div>
                     </article>
@@ -811,8 +731,7 @@
                             <div class="article-meta">Date de la nouvelle : 17 avril 2026</div>
                             <p class="article-excerpt">Le gouvernement québécois accélère la transformation numérique du système éducatif. Dès septembre, toutes les écoles secondaires seront équipées de salles intelligentes et de plateformes adaptatives.</p>
                             <div class="article-footer">
-                                <span class="read-time">5 min</span>
-                                <a href="#" class="continue-link">Lire</a>
+                                <span class="read-time">5 min de lecture</span>
                             </div>
                         </div>
                     </article>
@@ -825,8 +744,7 @@
                             <div class="article-meta">Date de la nouvelle : 17 avril 2026</div>
                             <p class="article-excerpt">Deux des plus grands acteurs du secteur technologique annoncent un partenariat stratégique sans précédent. Ensemble, ils vont développer une plateforme cloud décentralisée et ultra-sécurisée.</p>
                             <div class="article-footer">
-                                <span class="read-time">7 min</span>
-                                <a href="#" class="continue-link">Lire</a>
+                                <span class="read-time">7 min de lecture</span>
                             </div>
                         </div>
                     </article>
@@ -839,8 +757,124 @@
                             <div class="article-meta">Date de la nouvelle : 17 avril 2026</div>
                             <p class="article-excerpt">L'agence spatiale internationale lance une mission historique vers une exoplanète à seulement 12 années-lumière de la Terre. Un voyage révolutionnaire utilisant une propulsion à fusion nucléaire.</p>
                             <div class="article-footer">
-                                <span class="read-time">8 min</span>
-                                <a href="#" class="continue-link">Lire</a>
+                                <span class="read-time">8 min de lecture</span>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article>
+                        <div class="article-image"></div>
+                        <div class="article-header">
+                            <span class="category-badge">TECHNOLOGIE</span>
+                            <h3>Révolution Dans Les Semiconducteurs Quantiques</h3>
+                            <div class="article-meta">Date de la nouvelle : 17 avril 2026</div>
+                            <p class="article-excerpt">Des chercheurs annoncent une percée dans les circuits quantiques ultra-stables. Cette avancée pourrait révolutionner l'informatique et rendre obsolètes les systèmes de chiffrement actuels dans les 5 ans.</p>
+                            <div class="article-footer">
+                                <span class="read-time">6 min de lecture</span>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article>
+                        <div class="article-image"></div>
+                        <div class="article-header">
+                            <span class="category-badge">AFFAIRES</span>
+                            <h3>Les Cryptomonnaies Réglementées Par L'ONU</h3>
+                            <div class="article-meta">Date de la nouvelle : 17 avril 2026</div>
+                            <p class="article-excerpt">Les Nations Unies adoptent un cadre réglementaire global pour les actifs numériques. Cette décision historique devrait stabiliser le marché et attirer les institutions financières traditionnelles.</p>
+                            <div class="article-footer">
+                                <span class="read-time">5 min de lecture</span>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article>
+                        <div class="article-image"></div>
+                        <div class="article-header">
+                            <span class="category-badge">ENVIRONNEMENT</span>
+                            <h3>Découverte De Nouvelles Réserves D'Eau Douce</h3>
+                            <div class="article-meta">Date de la nouvelle : 17 avril 2026</div>
+                            <p class="article-excerpt">Des satellites détectent d'immenses réservoirs d'eau souterraine sous le Sahara. Cette découverte pourrait transformer les enjeux géopolitiques du continent africain pour les décennies à venir.</p>
+                            <div class="article-footer">
+                                <span class="read-time">7 min de lecture</span>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article>
+                        <div class="article-image"></div>
+                        <div class="article-header">
+                            <span class="category-badge">SCIENCES</span>
+                            <h3>Première Fusion Nucléaire Contrôlée Profitable</h3>
+                            <div class="article-meta">Date de la nouvelle : 17 avril 2026</div>
+                            <p class="article-excerpt">Un laboratoire américain annonce avoir réalisé la première réaction de fusion nucléaire qui génère plus d'énergie qu'elle n'en consomme. Une étape majeure vers l'énergie illimitée et décarbonée.</p>
+                            <div class="article-footer">
+                                <span class="read-time">8 min de lecture</span>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article>
+                        <div class="article-image"></div>
+                        <div class="article-header">
+                            <span class="category-badge">SANTÉ</span>
+                            <h3>Nouveau Vaccin Universel Contre Le Cancer</h3>
+                            <div class="article-meta">Date de la nouvelle : 17 avril 2026</div>
+                            <p class="article-excerpt">Une équipe de chercheurs présente un vaccin expérimental efficace contre plusieurs types de cancer. Les résultats des essais cliniques dépassent les attentes avec un taux de guérison de 85%.</p>
+                            <div class="article-footer">
+                                <span class="read-time">7 min de lecture</span>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article>
+                        <div class="article-image"></div>
+                        <div class="article-header">
+                            <span class="category-badge">GÉOPOLITIQUE</span>
+                            <h3>Nouvel Accord Commercial Multilatéral Signé</h3>
+                            <div class="article-meta">Date de la nouvelle : 17 avril 2026</div>
+                            <p class="article-excerpt">50 nations d'Asie et du Pacifique signent un accord commercial sans précédent. Cet accord pourrait redistribuer les équilibres économiques mondiaux et générer 2 000 milliards de dollars d'échanges supplémentaires.</p>
+                            <div class="article-footer">
+                                <span class="read-time">6 min de lecture</span>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article>
+                        <div class="article-image"></div>
+                        <div class="article-header">
+                            <span class="category-badge">TECHNOLOGIE</span>
+                            <h3>Les Voitures Autonomes Adoptées En Masse</h3>
+                            <div class="article-meta">Date de la nouvelle : 17 avril 2026</div>
+                            <p class="article-excerpt">Le nombre de véhicules entièrement autonomes en circulation dépasse le million. Les autorités routières rapportent une réduction de 70% des accidents dans les zones où ces véhicules sont déployés.</p>
+                            <div class="article-footer">
+                                <span class="read-time">5 min de lecture</span>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article>
+                        <div class="article-image"></div>
+                        <div class="article-header">
+                            <span class="category-badge">ENVIRONNEMENT</span>
+                            <h3>L'Amazonie Retrouve Son Équilibre Climatique</h3>
+                            <div class="article-meta">Date de la nouvelle : 17 avril 2026</div>
+                            <p class="article-excerpt">Pour la première fois en 30 ans, les études de déforestation de l'Amazonie montrent une hausse nette. Les efforts combinés de protection ont permis une régénération remarquable de la forêt tropicale.</p>
+                            <div class="article-footer">
+                                <span class="read-time">6 min de lecture</span>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article>
+                        <div class="article-image"></div>
+                        <div class="article-header">
+                            <span class="category-badge">INNOVATION</span>
+                            <h3>Batterie Révolutionnaire Dure 1 Million De Cycles</h3>
+                            <div class="article-meta">Date de la nouvelle : 17 avril 2026</div>
+                            <p class="article-excerpt">Une entreprise canadienne dévoile une batterie capable de fonctionner un million de cycles sans dégradation significative. Cette technologie pourrait transformer l'industrie des véhicules électriques et du stockage d'énergie.</p>
+                            <div class="article-footer">
+                                <span class="read-time">7 min de lecture</span>
                             </div>
                         </div>
                     </article>
@@ -887,14 +921,6 @@
             <p>Votre source fiable d'informations actualisées chaque jour à 07:00 heure de Québec</p>
             <div class="footer-divider"></div>
             <p>Technologie | Économie | Sciences | Innovation</p>
-            <div class="footer-links">
-                <a href="#">Technologie</a>
-                <a href="#">Affaires</a>
-                <a href="#">Sciences</a>
-                <a href="#">Société</a>
-                <a href="#">Confidentialité</a>
-                <a href="#">Contact</a>
-            </div>
             <div class="footer-divider"></div>
             <p><strong>© 2026 - Revue de Presse Automatisée</strong> | Tous droits réservés</p>
         </div>
