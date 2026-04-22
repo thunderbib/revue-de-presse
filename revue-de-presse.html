@@ -1,223 +1,4 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Agent de revue de presse quotidienne automatisée avec traduction en français.
-Récupère 15 articles de sources diversifiées, les traduit en français.
-Respecte strictement les critères de neutralité et rigueur analytique.
-"""
-
-import os
-import requests
-import urllib.parse
-from datetime import datetime, timedelta
-from html import escape
-import re
-import time
-
-# Mois en français
-MOIS_FR = [
-    "janvier", "février", "mars", "avril", "mai", "juin",
-    "juillet", "août", "septembre", "octobre", "novembre", "décembre"
-]
-
-def obtenir_date_francaise(date_obj=None):
-    """Retourne la date au format français."""
-    if date_obj is None:
-        date_obj = datetime.now()
-    jour = date_obj.day
-    mois = MOIS_FR[date_obj.month - 1]
-    annee = date_obj.year
-    return f"{jour} {mois} {annee}"
-
-def obtenir_horodatage():
-    """Retourne l'horodatage complet d'exécution."""
-    maintenant = datetime.now()
-    jour = maintenant.day
-    mois = MOIS_FR[maintenant.month - 1]
-    annee = maintenant.year
-    heure = maintenant.strftime("%H:%M:%S")
-    return f"{jour} {mois} {annee} à {heure}"
-
-def traduire_google(texte):
-    """
-    Traduit du texte en français via l'API Google Translate.
-    Méthode gratuite, sans clé d'authentification requise.
-    """
-    if not texte or len(texte) < 2:
-        return texte
-    
-    try:
-        # Encoder le texte
-        texte_encode = urllib.parse.quote(texte[:500])
-        
-        # URL de l'API Google Translate
-        url = f"https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=fr&dt=t&q={texte_encode}"
-        
-        # Faire la requête avec timeout
-        response = requests.get(url, timeout=5)
-        
-        if response.status_code == 200:
-            try:
-                data = response.json()
-                if data and len(data) > 0 and len(data[0]) > 0 and len(data[0][0]) > 0:
-                    traduction = data[0][0][0]
-                    return traduction
-            except:
-                return texte
-        
-        return texte
-    
-    except Exception as e:
-        return texte
-
-def recuperer_articles():
-    """Récupère les articles via NewsAPI."""
-    api_key = os.getenv("NEWSAPI_KEY", "")
-    
-    if not api_key:
-        print("❌ Erreur : NEWSAPI_KEY non configurée.")
-        print("Obtenez une clé gratuite sur https://newsapi.org")
-        exit(1)
-    
-    articles_par_categorie = {
-        "quebec": [],
-        "canada": [],
-        "usa": [],
-        "economy": [],
-        "geopolitics": []
-    }
-    
-    # Configuration des requêtes par catégorie
-    requetes = {
-        "quebec": "Montreal OR Quebec OR (Ville de Quebec)",
-        "canada": "Canada OR Ottawa OR Parliament",
-        "usa": "United States OR Washington OR White House OR Congress",
-        "economy": "economy OR markets OR business OR trading",
-        "geopolitics": "international OR geopolitics OR UN OR diplomacy"
-    }
-    
-    date_hier = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
-    
-    try:
-        for categorie, query in requetes.items():
-            print(f"  📡 Récupération articles {categorie}...")
-            
-            params = {
-                "q": query,
-                "apiKey": api_key,
-                "from": date_hier,
-                "sortBy": "relevancy",
-                "language": "en",
-                "pageSize": 100
-            }
-            
-            response = requests.get(
-                "https://newsapi.org/v2/everything",
-                params=params,
-                timeout=10
-            )
-            
-            if response.status_code == 200:
-                data = response.json()
-                
-                for article in data.get("articles", []):
-                    # Vérifier la qualité
-                    if (article.get("description") and 
-                        len(article.get("description", "")) > 80 and
-                        article.get("title")):
-                        
-                        articles_par_categorie[categorie].append({
-                            "title": article.get("title", ""),
-                            "description": article.get("description", ""),
-                            "url": article.get("url", ""),
-                            "source": article.get("source", {}).get("name", "Unknown"),
-                            "publishedAt": article.get("publishedAt", "")[:10],
-                        })
-        
-        return articles_par_categorie
-    
-    except requests.exceptions.RequestException as e:
-        print(f"❌ Erreur réseau : {e}")
-        exit(1)
-
-def generer_html(articles_par_categorie):
-    """Génère le HTML avec articles traduits en français."""
-    date_aujourd_hui = obtenir_date_francaise()
-    horodatage = obtenir_horodatage()
-    html_articles = ""
-    numero = 1
-    
-    # Ordre équilibré
-    ordre = ["canada", "quebec", "usa", "economy", "geopolitics"]
-    articles_selectionnes = []
-    
-    # Sélectionner 3 articles par catégorie
-    for cat in ordre:
-        for article in articles_par_categorie.get(cat, [])[:3]:
-            articles_selectionnes.append((cat, article))
-    
-    print(f"\n🌐 Traduction des articles en français...")
-    
-    # Générer les articles
-    for idx, (categorie, article) in enumerate(articles_selectionnes[:15]):
-        # Traduction avec affichage du statut
-        titre_en = article.get("title", "Sans titre")
-        desc_en = article.get("description", "")
-        
-        print(f"  [{idx+1}/15] Traduction: {titre_en[:60]}...")
-        
-        titre_fr = traduire_google(titre_en)
-        time.sleep(0.2)  # Éviter les limites de taux
-        desc_fr = traduire_google(desc_en)
-        
-        source = escape(article.get("source", "Unknown"))
-        date_article = article.get("publishedAt", "")
-        
-        # Mapper catégorie
-        labels = {
-            "quebec": "QUÉBEC",
-            "canada": "CANADA",
-            "usa": "ÉTATS-UNIS",
-            "economy": "ÉCONOMIE",
-            "geopolitics": "GÉOPOLITIQUE"
-        }
-        
-        html_articles += f"""
-                    <article>
-                        <div class="article-image"></div>
-                        <div class="article-header">
-                            <span class="category-badge">{labels.get(categorie, "GÉNÉRAL")}</span>
-                            <h3>{escape(titre_fr)}</h3>
-                            <div class="article-meta">Date de la nouvelle : {date_article}</div>
-                            <p class="article-excerpt">{escape(desc_fr[:250])}...</p>
-                            <div class="article-footer">
-                                <span class="read-time">Source : {source}</span>
-                            </div>
-                        </div>
-                    </article>
-"""
-        numero += 1
-    
-    # Remplir jusqu'à 15
-    while numero <= 15:
-        html_articles += f"""
-                    <article>
-                        <div class="article-image"></div>
-                        <div class="article-header">
-                            <span class="category-badge">ACTUALITÉS</span>
-                            <h3>En attente de données...</h3>
-                            <div class="article-meta">Date de la nouvelle : {date_aujourd_hui}</div>
-                            <p class="article-excerpt">Les données pour cet article se chargeront lors de la prochaine exécution.</p>
-                            <div class="article-footer">
-                                <span class="read-time">Revue de Presse Automatisée</span>
-                            </div>
-                        </div>
-                    </article>
-"""
-        numero += 1
-    
-    # Template HTML
-    html = f"""<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
@@ -226,25 +7,25 @@ def generer_html(articles_par_categorie):
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Courier+Prime:wght@400;700&display=swap');
 
-        * {{
+        * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-        }}
+        }
 
-        html {{
+        html {
             scroll-behavior: smooth;
-        }}
+        }
 
-        body {{
+        body {
             font-family: 'Courier Prime', monospace;
             line-height: 1.6;
             color: #1a1a1a;
             background-color: #e8e4d0;
             padding: 15px;
-        }}
+        }
 
-        header {{
+        header {
             background-color: #fff8f0;
             border: 6px solid #1a1a1a;
             border-top: 12px solid #1a1a1a;
@@ -254,9 +35,9 @@ def generer_html(articles_par_categorie):
             margin-bottom: 0;
             box-shadow: 5px 5px 0px rgba(0, 0, 0, 0.2);
             position: relative;
-        }}
+        }
 
-        header::before {{
+        header::before {
             content: '';
             position: absolute;
             top: 45px;
@@ -265,14 +46,14 @@ def generer_html(articles_par_categorie):
             height: 2px;
             background: #1a1a1a;
             box-shadow: 0 4px 0 #1a1a1a, 0 8px 0 #1a1a1a;
-        }}
+        }
 
-        header .content {{
+        header .content {
             position: relative;
             z-index: 1;
-        }}
+        }
 
-        header h1 {{
+        header h1 {
             font-family: 'Playfair Display', serif;
             font-size: 4.5em;
             font-weight: 900;
@@ -282,9 +63,9 @@ def generer_html(articles_par_categorie):
             color: #1a1a1a;
             line-height: 1;
             text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.1);
-        }}
+        }
 
-        header .subtitle {{
+        header .subtitle {
             font-family: 'Courier Prime', monospace;
             font-size: 1.2em;
             margin: 10px 0;
@@ -292,17 +73,17 @@ def generer_html(articles_par_categorie):
             color: #333;
             letter-spacing: 3px;
             text-transform: uppercase;
-        }}
+        }
 
-        header .tagline {{
+        header .tagline {
             font-style: italic;
             font-size: 0.9em;
             color: #555;
             margin: 8px 0 15px 0;
             letter-spacing: 1px;
-        }}
+        }
 
-        header .date-banner {{
+        header .date-banner {
             display: inline-block;
             padding: 8px 20px;
             border: 3px solid #1a1a1a;
@@ -312,16 +93,16 @@ def generer_html(articles_par_categorie):
             font-weight: bold;
             margin-top: 15px;
             letter-spacing: 2px;
-        }}
+        }
 
-        header .date-banner strong {{
+        header .date-banner strong {
             color: #1a1a1a;
             display: inline;
             font-weight: bold;
             margin-left: 8px;
-        }}
+        }
 
-        header .info-row {{
+        header .info-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -332,18 +113,9 @@ def generer_html(articles_par_categorie):
             font-family: 'Courier Prime', monospace;
             font-size: 0.95em;
             font-weight: bold;
-        }}
+        }
 
-        header .timestamp {{
-            font-size: 0.85em;
-            color: #666;
-            font-style: italic;
-            margin-top: 10px;
-            padding-top: 10px;
-            border-top: 1px dashed #1a1a1a;
-        }}
-
-        nav {{
+        nav {
             background: #1a1a1a;
             padding: 12px 30px;
             display: flex;
@@ -351,9 +123,9 @@ def generer_html(articles_par_categorie):
             gap: 40px;
             flex-wrap: wrap;
             border-bottom: 8px solid #333;
-        }}
+        }
 
-        nav span {{
+        nav span {
             color: #fff8f0;
             font-weight: bold;
             font-size: 0.9em;
@@ -361,18 +133,18 @@ def generer_html(articles_par_categorie):
             letter-spacing: 2px;
             font-family: 'Courier Prime', monospace;
             padding: 4px 8px;
-        }}
+        }
 
-        .container {{
+        .container {
             max-width: 100%;
             margin: 0;
             background: #fff8f0;
             padding: 30px;
             border-left: 8px solid #1a1a1a;
             border-right: 8px solid #1a1a1a;
-        }}
+        }
 
-        .articles-section h2 {{
+        .articles-section h2 {
             font-family: 'Playfair Display', serif;
             font-size: 2em;
             color: #1a1a1a;
@@ -385,15 +157,15 @@ def generer_html(articles_par_categorie):
             border-bottom: 4px double #1a1a1a;
             border-top: 2px solid #1a1a1a;
             padding-top: 12px;
-        }}
+        }
 
-        .articles-grid {{
+        .articles-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 20px;
-        }}
+        }
 
-        article {{
+        article {
             background: #fff8f0;
             border: 3px solid #1a1a1a;
             overflow: hidden;
@@ -402,14 +174,14 @@ def generer_html(articles_par_categorie):
             flex-direction: column;
             height: 100%;
             box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.12);
-        }}
+        }
 
-        article:hover {{
+        article:hover {
             transform: translate(3px, 3px);
             box-shadow: 0 0 0px rgba(0, 0, 0, 0.12);
-        }}
+        }
 
-        article .article-image {{
+        article .article-image {
             height: 160px;
             background: linear-gradient(45deg, #d4d0c8 25%, transparent 25%, transparent 75%, #d4d0c8 75%, #d4d0c8),
                         linear-gradient(45deg, #d4d0c8 25%, transparent 25%, transparent 75%, #d4d0c8 75%, #d4d0c8);
@@ -426,22 +198,22 @@ def generer_html(articles_par_categorie):
             padding: 12px;
             font-family: 'Courier Prime', monospace;
             font-weight: bold;
-        }}
+        }
 
-        article .article-image::before {{
+        article .article-image::before {
             content: '[PHOTO]';
             letter-spacing: 1px;
-        }}
+        }
 
-        article .article-header {{
+        article .article-header {
             padding: 15px;
             flex-grow: 1;
             display: flex;
             flex-direction: column;
             border-bottom: 2px dashed #1a1a1a;
-        }}
+        }
 
-        article .category-badge {{
+        article .category-badge {
             display: inline-block;
             background: #f0f0e8;
             color: #1a1a1a;
@@ -454,9 +226,9 @@ def generer_html(articles_par_categorie):
             text-transform: uppercase;
             letter-spacing: 1px;
             font-family: 'Courier Prime', monospace;
-        }}
+        }
 
-        article h3 {{
+        article h3 {
             font-family: 'Playfair Display', serif;
             font-size: 1.2em;
             color: #1a1a1a;
@@ -466,9 +238,9 @@ def generer_html(articles_par_categorie):
             font-weight: 900;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-        }}
+        }
 
-        article .article-meta {{
+        article .article-meta {
             color: #333;
             font-weight: bold;
             font-size: 0.75em;
@@ -476,9 +248,9 @@ def generer_html(articles_par_categorie):
             font-family: 'Courier Prime', monospace;
             letter-spacing: 1px;
             text-transform: uppercase;
-        }}
+        }
 
-        article .article-excerpt {{
+        article .article-excerpt {
             color: #1a1a1a;
             font-size: 0.9em;
             line-height: 1.6;
@@ -486,29 +258,29 @@ def generer_html(articles_par_categorie):
             flex-grow: 1;
             text-align: justify;
             font-family: 'Courier Prime', monospace;
-        }}
+        }
 
-        article .article-footer {{
+        article .article-footer {
             padding: 10px 0;
             font-size: 0.8em;
-        }}
+        }
 
-        article .read-time {{
+        article .read-time {
             color: #666;
             font-style: italic;
             font-family: 'Courier Prime', monospace;
             font-weight: bold;
-        }}
+        }
 
-        .sidebar {{
+        .sidebar {
             background: #f0f0e8;
             border: 3px double #1a1a1a;
             padding: 15px;
             margin-top: 20px;
             box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.1);
-        }}
+        }
 
-        .sidebar h3 {{
+        .sidebar h3 {
             font-family: 'Playfair Display', serif;
             font-size: 1.3em;
             color: #1a1a1a;
@@ -518,51 +290,40 @@ def generer_html(articles_par_categorie):
             border-bottom: 2px solid #1a1a1a;
             padding-bottom: 8px;
             letter-spacing: 1px;
-        }}
+        }
 
-        .sidebar p {{
+        .sidebar p {
             font-family: 'Courier Prime', monospace;
             font-size: 0.9em;
             color: #1a1a1a;
             margin-bottom: 8px;
             line-height: 1.6;
             text-align: justify;
-        }}
+        }
 
-        .update-timestamp {{
-            background: #e8e4d0;
-            border: 1px solid #1a1a1a;
-            padding: 10px;
-            margin-top: 15px;
-            text-align: center;
-            font-size: 0.85em;
-            font-style: italic;
-            color: #666;
-        }}
-
-        @media (max-width: 768px) {{
-            header h1 {{
+        @media (max-width: 768px) {
+            header h1 {
                 font-size: 3em;
-            }}
-            .articles-grid {{
+            }
+            .articles-grid {
                 grid-template-columns: 1fr;
-            }}
-        }}
+            }
+        }
 
-        @keyframes slideInUp {{
-            from {{
+        @keyframes slideInUp {
+            from {
                 opacity: 0;
                 transform: translateY(15px);
-            }}
-            to {{
+            }
+            to {
                 opacity: 1;
                 transform: translateY(0);
-            }}
-        }}
+            }
+        }
 
-        article {{
+        article {
             animation: slideInUp 0.6s ease-out;
-        }}
+        }
     </style>
 </head>
 <body>
@@ -574,12 +335,9 @@ def generer_html(articles_par_categorie):
             <div class="info-row">
                 <span>MONTRÉAL - QUÉBEC</span>
                 <div class="date-banner">
-                    Édition du <strong>Date du jour : {date_aujourd_hui}</strong>
+                    Édition du <strong>Date du jour : 22 avril 2026</strong>
                 </div>
                 <span>AUTOMATISÉE</span>
-            </div>
-            <div class="timestamp">
-                🕐 Mise à jour le {horodatage}
             </div>
         </div>
     </header>
@@ -596,7 +354,203 @@ def generer_html(articles_par_categorie):
         <section class="articles-section">
             <h2>ACTUALITÉS DU JOUR - 15 POINTS CLÉS</h2>
             <div class="articles-grid">
-{html_articles}
+
+                    <article>
+                        <div class="article-image"></div>
+                        <div class="article-header">
+                            <span class="category-badge">CANADA</span>
+                            <h3>Un ancien employé parlementaire arrêté en vertu de la loi anti-piratage</h3>
+                            <div class="article-meta">Date de la nouvelle : 2026-04-21</div>
+                            <p class="article-excerpt">Un homme de 40 ans a été arrêté à une adresse à Coventry par des détectives antiterroristes, a indiqué la police métropolitaine....</p>
+                            <div class="article-footer">
+                                <span class="read-time">Source : BBC News</span>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article>
+                        <div class="article-image"></div>
+                        <div class="article-header">
+                            <span class="category-badge">CANADA</span>
+                            <h3>Le manifeste du « super-vilain » d’Alex Karp met en danger les contrats de Palantir</h3>
+                            <div class="article-meta">Date de la nouvelle : 2026-04-21</div>
+                            <p class="article-excerpt">Les législateurs britanniques expriment leurs inquiétudes concernant les contrats du gouvernement avec la société de données controversée soutenue par Peter Thiel....</p>
+                            <div class="article-footer">
+                                <span class="read-time">Source : Gizmodo.com</span>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article>
+                        <div class="article-image"></div>
+                        <div class="article-header">
+                            <span class="category-badge">CANADA</span>
+                            <h3>Google Ads définit l&#x27;enregistrement des appels par défaut pour les appels de prospects IA via @sejournal, @MattGSouthern</h3>
+                            <div class="article-meta">Date de la nouvelle : 2026-04-21</div>
+                            <p class="article-excerpt">Google Ads active désormais l&#x27;enregistrement des appels par défaut pour les prospects éligibles qualifiés par l&#x27;IA, modifiant ainsi la façon dont les conversions par appel sont évaluées aux États-Unis et au Canada.
+...</p>
+                            <div class="article-footer">
+                                <span class="read-time">Source : Search Engine Journal</span>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article>
+                        <div class="article-image"></div>
+                        <div class="article-header">
+                            <span class="category-badge">QUÉBEC</span>
+                            <h3>Vivre à l’étranger il y a 20 ans a changé la façon dont nous faisons nos courses et planifions nos repas. </h3>
+                            <div class="article-meta">Date de la nouvelle : 2026-04-21</div>
+                            <p class="article-excerpt">Vivre à l&#x27;étranger en Europe a modifié nos habitudes d&#x27;achat d&#x27;épicerie et de planification des repas d&#x27;une manière qui a amélioré nos repas et notre santé physique et mentale....</p>
+                            <div class="article-footer">
+                                <span class="read-time">Source : Business Insider</span>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article>
+                        <div class="article-image"></div>
+                        <div class="article-header">
+                            <span class="category-badge">QUÉBEC</span>
+                            <h3>Les clubs de championnat refusent d&#x27;introduire le VAR la saison prochaine</h3>
+                            <div class="article-meta">Date de la nouvelle : 2026-04-21</div>
+                            <p class="article-excerpt">Les clubs de championnat ont refusé la possibilité d&#x27;introduire un système de défi de VAR pour la saison 2026-27....</p>
+                            <div class="article-footer">
+                                <span class="read-time">Source : BBC News</span>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article>
+                        <div class="article-image"></div>
+                        <div class="article-header">
+                            <span class="category-badge">QUÉBEC</span>
+                            <h3>Comment Mile End Kicks a consacré la scène indie cool de Montréal en 2011</h3>
+                            <div class="article-meta">Date de la nouvelle : 2026-04-21</div>
+                            <p class="article-excerpt">Dans cette entrevue avec Chandler Levack, scénariste et réalisateur de Mile End Kicks, elle parle du rock indie montréalais, de sa collaboration avec Barbie Ferreira et de la nostalgie des années 2010,...</p>
+                            <div class="article-footer">
+                                <span class="read-time">Source : The FADER</span>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article>
+                        <div class="article-image"></div>
+                        <div class="article-header">
+                            <span class="category-badge">ÉTATS-UNIS</span>
+                            <h3>Cet escroc a utilisé une MAGA Girl générée par l’IA pour arnaquer des hommes « super stupides »</h3>
+                            <div class="article-meta">Date de la nouvelle : 2026-04-21</div>
+                            <p class="article-excerpt">Un étudiant en médecine affirme avoir gagné des milliers de dollars en vendant des photos et des vidéos d’une jeune femme conservatrice qu’il a créées à l’aide d’outils génératifs. ...</p>
+                            <div class="article-footer">
+                                <span class="read-time">Source : Wired</span>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article>
+                        <div class="article-image"></div>
+                        <div class="article-header">
+                            <span class="category-badge">ÉTATS-UNIS</span>
+                            <h3>IA, marionnettes chaussettes et président de la Fed le plus riche de l&#x27;histoire : 3 points à retenir des audiences de confirmation de Kevin Warsh</h3>
+                            <div class="article-meta">Date de la nouvelle : 2026-04-21</div>
+                            <p class="article-excerpt">L&#x27;ancien dirigeant de Wall Street, Kevin Warsh, a témoigné mardi devant le Congrès au sujet de sa nomination à la présidence de la Fed....</p>
+                            <div class="article-footer">
+                                <span class="read-time">Source : Business Insider</span>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article>
+                        <div class="article-image"></div>
+                        <div class="article-header">
+                            <span class="category-badge">ÉTATS-UNIS</span>
+                            <h3>Un homme armé dans une fusillade sur un site touristique mexicain influencé par des actes de violence aux États-Unis (responsables)</h3>
+                            <div class="article-meta">Date de la nouvelle : 2026-04-21</div>
+                            <p class="article-excerpt">L&#x27;homme qui a ouvert le feu sur l&#x27;un des sites touristiques les plus fréquentés du Mexique aurait été influencé par des actes de violence commis aux États-Unis, ont indiqué mardi des responsables mexicains....</p>
+                            <div class="article-footer">
+                                <span class="read-time">Source : Abcnews.com</span>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article>
+                        <div class="article-image"></div>
+                        <div class="article-header">
+                            <span class="category-badge">ÉCONOMIE</span>
+                            <h3>Comment OpenClaw est devenu la prochaine grande nouveauté en Chine</h3>
+                            <div class="article-meta">Date de la nouvelle : 2026-04-21</div>
+                            <p class="article-excerpt">Installez des files d&#x27;attente. ...</p>
+                            <div class="article-footer">
+                                <span class="read-time">Source : Business Insider</span>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article>
+                        <div class="article-image"></div>
+                        <div class="article-header">
+                            <span class="category-badge">ÉCONOMIE</span>
+                            <h3>OnePlus dévoile de nouveaux téléphones malgré un avenir incertain</h3>
+                            <div class="article-meta">Date de la nouvelle : 2026-04-21</div>
+                            <p class="article-excerpt">Au milieu des rumeurs de sortie de certains marchés, la société présente les Nord CE6 et Nord CE6 Lite....</p>
+                            <div class="article-footer">
+                                <span class="read-time">Source : CNET</span>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article>
+                        <div class="article-image"></div>
+                        <div class="article-header">
+                            <span class="category-badge">ÉCONOMIE</span>
+                            <h3>L&#x27;héritage de Tim Cook transforme Apple en abonnement</h3>
+                            <div class="article-meta">Date de la nouvelle : 2026-04-21</div>
+                            <p class="article-excerpt">Le PDG d&#x27;Apple, qui va bientôt quitter l&#x27;entreprise, s&#x27;est mis à fond sur les services. ...</p>
+                            <div class="article-footer">
+                                <span class="read-time">Source : Wired</span>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article>
+                        <div class="article-image"></div>
+                        <div class="article-header">
+                            <span class="category-badge">GÉOPOLITIQUE</span>
+                            <h3>« The Omen » reste un rappel saisissant qu’aucune bonne action ne reste impunie</h3>
+                            <div class="article-meta">Date de la nouvelle : 2026-04-21</div>
+                            <p class="article-excerpt">Tout le monde se souvient du gamin effrayant au centre du classique de l’horreur de 1976, mais il ne représente qu’une partie du problème....</p>
+                            <div class="article-footer">
+                                <span class="read-time">Source : Gizmodo.com</span>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article>
+                        <div class="article-image"></div>
+                        <div class="article-header">
+                            <span class="category-badge">GÉOPOLITIQUE</span>
+                            <h3>Les astronautes de l&#x27;ISS sont en pleine refonte technologique</h3>
+                            <div class="article-meta">Date de la nouvelle : 2026-04-21</div>
+                            <p class="article-excerpt">Même les astronautes ont besoin de mettre à niveau leurs ordinateurs portables de temps en temps - y compris l&#x27;équipage de l&#x27;Expédition 74 à bord de l&#x27;ISS, dont la NASA a annoncé la semaine dernière qu&#x27;il était en train de mettre à niveau son ordinat...</p>
+                            <div class="article-footer">
+                                <span class="read-time">Source : The Verge</span>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article>
+                        <div class="article-image"></div>
+                        <div class="article-header">
+                            <span class="category-badge">GÉOPOLITIQUE</span>
+                            <h3>La réponse d&#x27;Endless Legend 2 au problème commun 4X de l&#x27;IA du &quot;poisson rouge&quot; est un système astucieux de badges, de Pleasant à Bully</h3>
+                            <div class="article-meta">Date de la nouvelle : 2026-04-21</div>
+                            <p class="article-excerpt">La partie la moins impliquante de toute stratégie 4X est très souvent la diplomatie avec les civilisations IA. ...</p>
+                            <div class="article-footer">
+                                <span class="read-time">Source : Rock Paper Shotgun</span>
+                            </div>
+                        </div>
+                    </article>
+
             </div>
         </section>
 
@@ -604,43 +558,7 @@ def generer_html(articles_par_categorie):
             <h3>À PROPOS DE CETTE REVUE</h3>
             <p><strong>Traduction automatique :</strong> Tous les articles sont traduits en français via Google Translate.</p>
             <p><strong>Mise à jour :</strong> Quotidienne à 07:00 heure de Québec avec sources diversifiées.</p>
-            <p><strong>Dernière exécution :</strong> {horodatage}</p>
-            <div class="update-timestamp">
-                ✓ Revue générée le {horodatage}
-            </div>
         </aside>
     </div>
 </body>
 </html>
-"""
-    
-    return html
-
-def main():
-    """Fonction principale."""
-    print("\n" + "="*50)
-    print("🗞️  REVUE DE PRESSE AUTOMATISÉE")
-    print("="*50)
-    print(f"🕐 Exécution lancée le {obtenir_horodatage()}")
-    print("="*50)
-    
-    print("\n📰 Récupération des articles...")
-    articles = recuperer_articles()
-    
-    print("\n✏️  Génération du HTML...")
-    html_content = generer_html(articles)
-    
-    print("\n💾 Sauvegarde du fichier...")
-    try:
-        with open("revue-de-presse.html", "w", encoding="utf-8") as f:
-            f.write(html_content)
-        print(f"\n✅ Succès! Revue mise à jour : {obtenir_date_francaise()}")
-        print(f"🕐 Horodatage : {obtenir_horodatage()}")
-        print("="*50)
-        exit(0)
-    except Exception as e:
-        print(f"\n❌ Erreur : {e}")
-        exit(1)
-
-if __name__ == "__main__":
-    main()
