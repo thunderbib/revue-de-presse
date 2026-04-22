@@ -25,7 +25,6 @@
             padding: 15px;
         }
 
-        /* HEADER - STYLE JOURNAL USA 1980s */
         header {
             background-color: #fff8f0;
             border: 6px solid #1a1a1a;
@@ -71,11 +70,10 @@
             font-family: 'Courier Prime', monospace;
             font-size: 1.2em;
             margin: 10px 0;
-            font-weight: normal;
+            font-weight: bold;
             color: #333;
             letter-spacing: 3px;
             text-transform: uppercase;
-            font-weight: bold;
         }
 
         header .tagline {
@@ -105,7 +103,6 @@
             margin-left: 8px;
         }
 
-        /* PRICE AND INFO ROW */
         header .info-row {
             display: flex;
             justify-content: space-between;
@@ -123,7 +120,6 @@
             letter-spacing: 1px;
         }
 
-        /* NAVIGATION - MASTHEAD STYLE */
         nav {
             background: #1a1a1a;
             padding: 12px 30px;
@@ -144,125 +140,18 @@
             padding: 4px 8px;
         }
 
-        /* MAIN CONTAINER */
         .container {
             max-width: 100%;
             margin: 0;
             background: #fff8f0;
             padding: 30px;
             display: grid;
-            grid-template-columns: 2fr 1fr;
+            grid-template-columns: 1fr;
             gap: 30px;
             border-left: 8px solid #1a1a1a;
             border-right: 8px solid #1a1a1a;
         }
 
-        .main-content {
-            border-right: 3px solid #1a1a1a;
-            padding-right: 30px;
-        }
-
-        .sidebar {
-            border-left: 3px solid #1a1a1a;
-            padding-left: 30px;
-        }
-
-        /* HERO ARTICLE - UNE */
-        .hero-section {
-            background: #fff8f0;
-            border: 4px solid #1a1a1a;
-            margin-bottom: 30px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            padding: 20px;
-            box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.15);
-        }
-
-        .hero-image {
-            background: linear-gradient(45deg, #d4d0c8 25%, transparent 25%, transparent 75%, #d4d0c8 75%, #d4d0c8),
-                        linear-gradient(45deg, #d4d0c8 25%, transparent 25%, transparent 75%, #d4d0c8 75%, #d4d0c8);
-            background-size: 20px 20px;
-            background-position: 0 0, 10px 10px;
-            background-color: #c4c0b8;
-            border: 3px solid #1a1a1a;
-            min-height: 280px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            font-size: 0.85em;
-            color: #555;
-            text-align: center;
-            padding: 20px;
-            font-family: 'Courier Prime', monospace;
-        }
-
-        .hero-image::before {
-            content: '[PHOTO: MAIN STORY]';
-            font-weight: bold;
-            letter-spacing: 1px;
-        }
-
-        .hero-content {
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-        }
-
-        .hero-content .category {
-            display: inline-block;
-            background: #1a1a1a;
-            color: #fff8f0;
-            padding: 6px 12px;
-            font-size: 0.7em;
-            font-weight: bold;
-            margin-bottom: 10px;
-            width: fit-content;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            font-family: 'Courier Prime', monospace;
-            border: 2px solid #1a1a1a;
-        }
-
-        .hero-content h2 {
-            font-family: 'Playfair Display', serif;
-            font-size: 2.2em;
-            color: #1a1a1a;
-            margin-bottom: 12px;
-            line-height: 1.2;
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .hero-content .article-date {
-            color: #333;
-            font-weight: bold;
-            font-size: 0.85em;
-            margin-bottom: 12px;
-            font-family: 'Courier Prime', monospace;
-            letter-spacing: 1px;
-        }
-
-        .hero-content p {
-            color: #1a1a1a;
-            margin-bottom: 12px;
-            font-size: 0.95em;
-            line-height: 1.7;
-            text-align: justify;
-            font-family: 'Courier Prime', monospace;
-            column-count: 2;
-            column-gap: 15px;
-        }
-
-        .hero-content p:nth-of-type(1)::first-letter {
-            font-size: 1.8em;
-            font-weight: bold;
-            margin-right: 2px;
-        }
-
-        /* ARTICLES GRID */
         .articles-section h2 {
             font-family: 'Playfair Display', serif;
             font-size: 2em;
@@ -283,7 +172,6 @@
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 20px;
-            margin-bottom: 0;
         }
 
         article {
@@ -393,16 +281,15 @@
             font-weight: bold;
         }
 
-        /* SIDEBAR */
-        .sidebar-box {
+        .sidebar {
             background: #f0f0e8;
             border: 3px double #1a1a1a;
             padding: 15px;
-            margin-bottom: 20px;
+            margin-top: 20px;
             box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.1);
         }
 
-        .sidebar-box h3 {
+        .sidebar h3 {
             font-family: 'Playfair Display', serif;
             font-size: 1.3em;
             color: #1a1a1a;
@@ -414,7 +301,7 @@
             letter-spacing: 1px;
         }
 
-        .sidebar-box p {
+        .sidebar p {
             font-family: 'Courier Prime', monospace;
             font-size: 0.9em;
             color: #1a1a1a;
@@ -423,193 +310,15 @@
             text-align: justify;
         }
 
-        .sidebar-box ul {
-            list-style: none;
-            padding-left: 15px;
-        }
-
-        .sidebar-box li {
-            font-family: 'Courier Prime', monospace;
-            font-size: 0.9em;
-            color: #1a1a1a;
-            margin-bottom: 6px;
-            position: relative;
-            padding-left: 12px;
-        }
-
-        .sidebar-box li::before {
-            content: '■';
-            position: absolute;
-            left: 0;
-            font-size: 0.7em;
-        }
-
-        /* FOOTER */
-        footer {
-            background: #1a1a1a;
-            color: #fff8f0;
-            padding: 25px 30px;
-            text-align: center;
-            margin-top: 0;
-            border-top: 10px solid #333;
-            border-bottom: 8px solid #333;
-        }
-
-        footer .footer-content {
-            max-width: 100%;
-        }
-
-        footer h3 {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.4em;
-            margin-bottom: 10px;
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        footer p {
-            margin: 6px 0;
-            opacity: 0.95;
-            font-size: 0.85em;
-            font-family: 'Courier Prime', monospace;
-            letter-spacing: 1px;
-        }
-
-        footer .footer-divider {
-            height: 2px;
-            background: rgba(255, 248, 240, 0.3);
-            margin: 15px 0;
-        }
-
-        /* RESPONSIVE */
-        @media (max-width: 1200px) {
-            .container {
-                grid-template-columns: 1fr;
-            }
-
-            .main-content {
-                border-right: none;
-                border-bottom: 3px solid #1a1a1a;
-                padding-right: 0;
-                padding-bottom: 30px;
-            }
-
-            .sidebar {
-                border-left: none;
-                border-top: 3px solid #1a1a1a;
-                padding-left: 0;
-                padding-top: 30px;
-            }
-        }
-
         @media (max-width: 768px) {
             header h1 {
                 font-size: 3em;
             }
-
-            header .subtitle {
-                font-size: 1em;
-            }
-
-            .hero-section {
-                grid-template-columns: 1fr;
-                padding: 15px;
-            }
-
-            .hero-content h2 {
-                font-size: 1.6em;
-            }
-
-            .hero-content p {
-                column-count: 1;
-            }
-
             .articles-grid {
                 grid-template-columns: 1fr;
-                gap: 15px;
-            }
-
-            article .article-image {
-                height: 140px;
-            }
-
-            .articles-section h2 {
-                font-size: 1.4em;
-                margin-bottom: 15px;
-            }
-
-            nav {
-                gap: 20px;
-                padding: 10px 20px;
-            }
-
-            nav span {
-                font-size: 0.8em;
-            }
-
-            .container {
-                padding: 20px;
-                gap: 20px;
-            }
-
-            .main-content {
-                padding-right: 0;
-            }
-
-            .sidebar {
-                padding-left: 0;
             }
         }
 
-        @media (max-width: 480px) {
-            header {
-                padding: 15px 20px;
-            }
-
-            header h1 {
-                font-size: 2.2em;
-                letter-spacing: 0px;
-            }
-
-            header .subtitle {
-                font-size: 0.8em;
-                letter-spacing: 1px;
-            }
-
-            header .info-row {
-                flex-direction: column;
-                gap: 8px;
-            }
-
-            .hero-section {
-                padding: 12px;
-                gap: 12px;
-            }
-
-            .hero-content h2 {
-                font-size: 1.3em;
-            }
-
-            article .article-header {
-                padding: 12px;
-            }
-
-            article h3 {
-                font-size: 1em;
-            }
-
-            nav {
-                gap: 10px;
-                padding: 8px 15px;
-            }
-
-            .container {
-                padding: 15px;
-            }
-        }
-
-        /* ANIMATIONS */
         @keyframes slideInUp {
             from {
                 opacity: 0;
@@ -624,21 +333,6 @@
         article {
             animation: slideInUp 0.6s ease-out;
         }
-
-        article:nth-child(2) { animation-delay: 0.1s; }
-        article:nth-child(3) { animation-delay: 0.2s; }
-        article:nth-child(4) { animation-delay: 0.3s; }
-        article:nth-child(5) { animation-delay: 0.4s; }
-        article:nth-child(6) { animation-delay: 0.5s; }
-        article:nth-child(7) { animation-delay: 0.6s; }
-        article:nth-child(8) { animation-delay: 0.7s; }
-        article:nth-child(9) { animation-delay: 0.8s; }
-        article:nth-child(10) { animation-delay: 0.9s; }
-        article:nth-child(11) { animation-delay: 1s; }
-        article:nth-child(12) { animation-delay: 1.1s; }
-        article:nth-child(13) { animation-delay: 1.2s; }
-        article:nth-child(14) { animation-delay: 1.3s; }
-        article:nth-child(15) { animation-delay: 1.4s; }
     </style>
 </head>
 <body>
@@ -650,49 +344,35 @@
             <div class="info-row">
                 <span>MONTRÉAL - QUÉBEC</span>
                 <div class="date-banner">
-                    Édition du <strong>R avril 2026</strong>
+                    Édition du <strong>Date du jour : 22 avril 2026</strong>
                 </div>
-                <span>50¢</span>
+                <span>AUTOMATISÉE</span>
             </div>
         </div>
     </header>
 
     <nav>
-        <span>TECHNOLOGIE</span>
-        <span>AFFAIRES</span>
-        <span>SCIENCES</span>
-        <span>ENVIRONNEMENT</span>
-        <span>SOCIÉTÉ</span>
+        <span>QUÉBEC</span>
+        <span>CANADA</span>
+        <span>ÉTATS-UNIS</span>
+        <span>ÉCONOMIE</span>
+        <span>GÉOPOLITIQUE</span>
     </nav>
 
     <div class="container">
-        <div class="main-content">
-            <!-- ARTICLE VEDETTE -->
-            <section class="hero-section">
-                <div class="hero-image"></div>
-                <div class="hero-content">
-                    <span class="category">TECHNOLOGIE</span>
-                    <h2>L'Intelligence Artificielle Révolutionne Le Diagnostic Médical</h2>
-                    <div class="article-date">R avril 2026</div>
-                    <p>Une percée majeure dans le domaine de l'intelligence artificielle promet de transformer complètement le secteur médical. Des systèmes d'IA dernière génération sont maintenant capables d'analyser les images médicales avec une précision surhumaine, dépassant même les experts les plus chevronnés.</p>
-                    <p>Les chercheurs rapportent que ces algorithmes peuvent identifier les tumeurs malignes, les fractures osseuses et les anomalies cardiovasculaires en moins de 5 secondes, réduisant considérablement le temps d'attente des patients et améliorant les taux de survie de 40% dans les essais cliniques initiaux.</p>
-                </div>
-            </section>
+        <section class="articles-section">
+            <h2>ACTUALITÉS DU JOUR - 15 POINTS CLÉS</h2>
+            <div class="articles-grid">
 
-            <!-- SECTION ARTICLES -->
-            <section class="articles-section">
-                <h2>AUTRES NOUVELLES DU JOUR</h2>
-
-                <div class="articles-grid">
                     <article>
                         <div class="article-image"></div>
                         <div class="article-header">
-                            <span class="category-badge">ENVIRONNEMENT</span>
-                            <h3>Québec Accélère Sa Transition Énergétique</h3>
-                            <div class="article-meta">R avril 2026</div>
-                            <p class="article-excerpt">La province de Québec dévoile un plan ambitieux d'investissement de 8 milliards de dollars sur dix ans pour renforcer son infrastructure énergétique verte. Ce programme comprend le déploiement massif d'éoliennes, de panneaux solaires et de technologies révolutionnaires.</p>
+                            <span class="category-badge">CANADA</span>
+                            <h3>Ex-parliamentary employee arrested under anti-hacking law</h3>
+                            <div class="article-meta">Date de la nouvelle : 2026-04-21</div>
+                            <p class="article-excerpt">A 40-year-old man was arrested at an address in Coventry by counter terrorism detectives, the Metropolitan Police said.</p>
                             <div class="article-footer">
-                                <span class="read-time">5 min de lecture</span>
+                                <span class="read-time">Source : BBC News</span>
                             </div>
                         </div>
                     </article>
@@ -700,12 +380,12 @@
                     <article>
                         <div class="article-image"></div>
                         <div class="article-header">
-                            <span class="category-badge">AFFAIRES</span>
-                            <h3>Les Startups Québécoises Attirent Wall Street</h3>
-                            <div class="article-meta">R avril 2026</div>
-                            <p class="article-excerpt">Le secteur technologique du Québec connaît une croissance exponentielle avec un afflux record d'investissements étrangers. Les startups locales levaient 1.2 milliard de dollars en 2025, représentant une augmentation de 35%.</p>
+                            <span class="category-badge">CANADA</span>
+                            <h3>Gunman shoots several tourists at historic pyramids in Mexico</h3>
+                            <div class="article-meta">Date de la nouvelle : 2026-04-21</div>
+                            <p class="article-excerpt">A man standing atop one of the historic Teotihuacan pyramids opened fire on tourists Monday, killing one Canadian and leaving at least 13 people, authorities said.</p>
                             <div class="article-footer">
-                                <span class="read-time">4 min de lecture</span>
+                                <span class="read-time">Source : NPR</span>
                             </div>
                         </div>
                     </article>
@@ -713,12 +393,12 @@
                     <article>
                         <div class="article-image"></div>
                         <div class="article-header">
-                            <span class="category-badge">SCIENCES</span>
-                            <h3>Nouvelle Espèce De Corail Ultra-Résistante</h3>
-                            <div class="article-meta">R avril 2026</div>
-                            <p class="article-excerpt">Une équipe internationale de biologistes marins découvre une espèce de corail capable de survivre à des températures 5°C plus élevées que les espèces existantes. Une découverte promettante pour la préservation des récifs.</p>
+                            <span class="category-badge">CANADA</span>
+                            <h3>Google&#x27;s Internal Politics Leave It Playing Catch-Up On AI Coding</h3>
+                            <div class="article-meta">Date de la nouvelle : 2026-04-21</div>
+                            <p class="article-excerpt">An anonymous reader quotes a report from Bloomberg: At Google, leaders are anxious about falling behind in the race to offer AI coding tools, especially as rivals like Anthropic PBC offer more effective and popular tools to businesses, according to people fam…</p>
                             <div class="article-footer">
-                                <span class="read-time">6 min de lecture</span>
+                                <span class="read-time">Source : Slashdot.org</span>
                             </div>
                         </div>
                     </article>
@@ -726,12 +406,12 @@
                     <article>
                         <div class="article-image"></div>
                         <div class="article-header">
-                            <span class="category-badge">ÉDUCATION</span>
-                            <h3>Numérisation Complète Des Écoles Québécoises</h3>
-                            <div class="article-meta">R avril 2026</div>
-                            <p class="article-excerpt">Le gouvernement québécois accélère la transformation numérique du système éducatif. Dès septembre, toutes les écoles secondaires seront équipées de salles intelligentes et de plateformes adaptatives.</p>
+                            <span class="category-badge">ÉTATS-UNIS</span>
+                            <h3>Another Trump Cabinet Member Is Out</h3>
+                            <div class="article-meta">Date de la nouvelle : 2026-04-21</div>
+                            <p class="article-excerpt">Lori Chavez-DeRemer was supposed to take the GOP in a more worker-friendly direction. Instead she is departing amid scandal.</p>
                             <div class="article-footer">
-                                <span class="read-time">5 min de lecture</span>
+                                <span class="read-time">Source : The Atlantic</span>
                             </div>
                         </div>
                     </article>
@@ -739,12 +419,13 @@
                     <article>
                         <div class="article-image"></div>
                         <div class="article-header">
-                            <span class="category-badge">PARTENARIATS</span>
-                            <h3>Deux Géants Technologiques S'Allient</h3>
-                            <div class="article-meta">R avril 2026</div>
-                            <p class="article-excerpt">Deux des plus grands acteurs du secteur technologique annoncent un partenariat stratégique sans précédent. Ensemble, ils vont développer une plateforme cloud décentralisée et ultra-sécurisée.</p>
+                            <span class="category-badge">ÉTATS-UNIS</span>
+                            <h3>U.S. Personnel Who Died in Mexico Were Working For the CIA, Sources Say</h3>
+                            <div class="article-meta">Date de la nouvelle : 2026-04-21</div>
+                            <p class="article-excerpt">Two Americans killed in Mexico, previously identified only as “staff from the United States Embassy,” participated in a raid on a drug lab.
+The post U.S. Personnel Who Died in Mexico Were Working For the CIA, Sources Say appeared first on The Intercept.</p>
                             <div class="article-footer">
-                                <span class="read-time">7 min de lecture</span>
+                                <span class="read-time">Source : The Intercept</span>
                             </div>
                         </div>
                     </article>
@@ -752,12 +433,12 @@
                     <article>
                         <div class="article-image"></div>
                         <div class="article-header">
-                            <span class="category-badge">INNOVATION</span>
-                            <h3>Nouvelle Mission Spatiale Historique</h3>
-                            <div class="article-meta">R avril 2026</div>
-                            <p class="article-excerpt">L'agence spatiale internationale lance une mission historique vers une exoplanète à seulement 12 années-lumière de la Terre. Un voyage révolutionnaire utilisant une propulsion à fusion nucléaire.</p>
+                            <span class="category-badge">ÉTATS-UNIS</span>
+                            <h3>Iran-US war: Four scenarios for what’s next as talks stumble</h3>
+                            <div class="article-meta">Date de la nouvelle : 2026-04-21</div>
+                            <p class="article-excerpt">Between an expiring ceasefire and a possible deal lies a range of ways in which the war could proceed, analysts say.</p>
                             <div class="article-footer">
-                                <span class="read-time">8 min de lecture</span>
+                                <span class="read-time">Source : Al Jazeera English</span>
                             </div>
                         </div>
                     </article>
@@ -765,12 +446,12 @@
                     <article>
                         <div class="article-image"></div>
                         <div class="article-header">
-                            <span class="category-badge">TECHNOLOGIE</span>
-                            <h3>Révolution Dans Les Semiconducteurs Quantiques</h3>
-                            <div class="article-meta">R avril 2026</div>
-                            <p class="article-excerpt">Des chercheurs annoncent une percée dans les circuits quantiques ultra-stables. Cette avancée pourrait révolutionner l'informatique et rendre obsolètes les systèmes de chiffrement actuels dans les 5 ans.</p>
+                            <span class="category-badge">ÉCONOMIE</span>
+                            <h3>What smart people are saying about the future of the Fed under Kevin Warsh</h3>
+                            <div class="article-meta">Date de la nouvelle : 2026-04-21</div>
+                            <p class="article-excerpt">With concerns over Fed independence, Trump nominee Kevin Warsh could still face an uphill battle in the Senate.</p>
                             <div class="article-footer">
-                                <span class="read-time">6 min de lecture</span>
+                                <span class="read-time">Source : Business Insider</span>
                             </div>
                         </div>
                     </article>
@@ -778,12 +459,12 @@
                     <article>
                         <div class="article-image"></div>
                         <div class="article-header">
-                            <span class="category-badge">AFFAIRES</span>
-                            <h3>Les Cryptomonnaies Réglementées Par L'ONU</h3>
-                            <div class="article-meta">R avril 2026</div>
-                            <p class="article-excerpt">Les Nations Unies adoptent un cadre réglementaire global pour les actifs numériques. Cette décision historique devrait stabiliser le marché et attirer les institutions financières traditionnelles.</p>
+                            <span class="category-badge">ÉCONOMIE</span>
+                            <h3>Tim Cook&#x27;s Legacy Is Turning Apple Into a Subscription</h3>
+                            <div class="article-meta">Date de la nouvelle : 2026-04-21</div>
+                            <p class="article-excerpt">The soon-to-exit Apple CEO went all in on services. Now, the incoming CEO, John Ternus, will need to embrace the AI era.</p>
                             <div class="article-footer">
-                                <span class="read-time">5 min de lecture</span>
+                                <span class="read-time">Source : Wired</span>
                             </div>
                         </div>
                     </article>
@@ -791,38 +472,12 @@
                     <article>
                         <div class="article-image"></div>
                         <div class="article-header">
-                            <span class="category-badge">ENVIRONNEMENT</span>
-                            <h3>Découverte De Nouvelles Réserves D'Eau Douce</h3>
-                            <div class="article-meta">R avril 2026</div>
-                            <p class="article-excerpt">Des satellites détectent d'immenses réservoirs d'eau souterraine sous le Sahara. Cette découverte pourrait transformer les enjeux géopolitiques du continent africain pour les décennies à venir.</p>
+                            <span class="category-badge">ÉCONOMIE</span>
+                            <h3>I&#x27;m the 83-year-old founder and chairman of a PE firm. Here&#x27;s my daily routine that&#x27;s reversing my biological age.</h3>
+                            <div class="article-meta">Date de la nouvelle : 2026-04-21</div>
+                            <p class="article-excerpt">Robert Rosenkranz schedules every hour of his day, including his social calls, and splits his time between Aspen, London, East Hampton, and New York.</p>
                             <div class="article-footer">
-                                <span class="read-time">7 min de lecture</span>
-                            </div>
-                        </div>
-                    </article>
-
-                    <article>
-                        <div class="article-image"></div>
-                        <div class="article-header">
-                            <span class="category-badge">SCIENCES</span>
-                            <h3>Première Fusion Nucléaire Contrôlée Profitable</h3>
-                            <div class="article-meta">R avril 2026</div>
-                            <p class="article-excerpt">Un laboratoire américain annonce avoir réalisé la première réaction de fusion nucléaire qui génère plus d'énergie qu'elle n'en consomme. Une étape majeure vers l'énergie illimitée et décarbonée.</p>
-                            <div class="article-footer">
-                                <span class="read-time">8 min de lecture</span>
-                            </div>
-                        </div>
-                    </article>
-
-                    <article>
-                        <div class="article-image"></div>
-                        <div class="article-header">
-                            <span class="category-badge">SANTÉ</span>
-                            <h3>Nouveau Vaccin Universel Contre Le Cancer</h3>
-                            <div class="article-meta">R avril 2026</div>
-                            <p class="article-excerpt">Une équipe de chercheurs présente un vaccin expérimental efficace contre plusieurs types de cancer. Les résultats des essais cliniques dépassent les attentes avec un taux de guérison de 85%.</p>
-                            <div class="article-footer">
-                                <span class="read-time">7 min de lecture</span>
+                                <span class="read-time">Source : Business Insider</span>
                             </div>
                         </div>
                     </article>
@@ -831,11 +486,11 @@
                         <div class="article-image"></div>
                         <div class="article-header">
                             <span class="category-badge">GÉOPOLITIQUE</span>
-                            <h3>Nouvel Accord Commercial Multilatéral Signé</h3>
-                            <div class="article-meta">R avril 2026</div>
-                            <p class="article-excerpt">50 nations d'Asie et du Pacifique signent un accord commercial sans précédent. Cet accord pourrait redistribuer les équilibres économiques mondiaux et générer 2 000 milliards de dollars d'échanges supplémentaires.</p>
+                            <h3>Global Growth In Solar &#x27;the Largest Ever Observed For Any Source&#x27;</h3>
+                            <div class="article-meta">Date de la nouvelle : 2026-04-21</div>
+                            <p class="article-excerpt">The IEA says 2025 marked a turning point for global energy, with solar posting the largest growth ever seen for any energy source and helping carbon-free power outpace rising demand. The trend led the agency to declare that the world has entered the &quot;Age of E…</p>
                             <div class="article-footer">
-                                <span class="read-time">6 min de lecture</span>
+                                <span class="read-time">Source : Slashdot.org</span>
                             </div>
                         </div>
                     </article>
@@ -843,12 +498,12 @@
                     <article>
                         <div class="article-image"></div>
                         <div class="article-header">
-                            <span class="category-badge">TECHNOLOGIE</span>
-                            <h3>Les Voitures Autonomes Adoptées En Masse</h3>
-                            <div class="article-meta">R avril 2026</div>
-                            <p class="article-excerpt">Le nombre de véhicules entièrement autonomes en circulation dépasse le million. Les autorités routières rapportent une réduction de 70% des accidents dans les zones où ces véhicules sont déployés.</p>
+                            <span class="category-badge">GÉOPOLITIQUE</span>
+                            <h3>‘The Omen’ Remains a Searing Reminder That No Good Deed Goes Unpunished</h3>
+                            <div class="article-meta">Date de la nouvelle : 2026-04-21</div>
+                            <p class="article-excerpt">Everyone remembers the creepy kid at the center of the 1976 horror classic—but he’s only part of the problem.</p>
                             <div class="article-footer">
-                                <span class="read-time">5 min de lecture</span>
+                                <span class="read-time">Source : Gizmodo.com</span>
                             </div>
                         </div>
                     </article>
@@ -856,12 +511,12 @@
                     <article>
                         <div class="article-image"></div>
                         <div class="article-header">
-                            <span class="category-badge">ENVIRONNEMENT</span>
-                            <h3>L'Amazonie Retrouve Son Équilibre Climatique</h3>
-                            <div class="article-meta">R avril 2026</div>
-                            <p class="article-excerpt">Pour la première fois en 30 ans, les études de déforestation de l'Amazonie montrent une hausse nette. Les efforts combinés de protection ont permis une régénération remarquable de la forêt tropicale.</p>
+                            <span class="category-badge">GÉOPOLITIQUE</span>
+                            <h3>Endless Legend 2&#x27;s answer to the common 4X problem of &quot;goldfish&quot; AI is a cunning system of badges, from Pleasant to Bully</h3>
+                            <div class="article-meta">Date de la nouvelle : 2026-04-21</div>
+                            <p class="article-excerpt">The least involving part of any 4X strategy is very often diplomacy with AI civilizations. Even Endless Legend 2, a game with a faction of coral people who can make other people like them by infesting their territory with spores, does settle into a formula. Y…</p>
                             <div class="article-footer">
-                                <span class="read-time">6 min de lecture</span>
+                                <span class="read-time">Source : Rock Paper Shotgun</span>
                             </div>
                         </div>
                     </article>
@@ -869,61 +524,50 @@
                     <article>
                         <div class="article-image"></div>
                         <div class="article-header">
-                            <span class="category-badge">INNOVATION</span>
-                            <h3>Batterie Révolutionnaire Dure 1 Million De Cycles</h3>
-                            <div class="article-meta">R avril 2026</div>
-                            <p class="article-excerpt">Une entreprise canadienne dévoile une batterie capable de fonctionner un million de cycles sans dégradation significative. Cette technologie pourrait transformer l'industrie des véhicules électriques et du stockage d'énergie.</p>
+                            <span class="category-badge">ACTUALITÉS</span>
+                            <h3>En attente de mise à jour...</h3>
+                            <div class="article-meta">Date de la nouvelle : 22 avril 2026</div>
+                            <p class="article-excerpt">Les données pour cet article se chargeront lors de la prochaine exécution.</p>
                             <div class="article-footer">
-                                <span class="read-time">7 min de lecture</span>
+                                <span class="read-time">Revue de Presse Automatisée</span>
                             </div>
                         </div>
                     </article>
-                </div>
-            </section>
-        </div>
 
-        <!-- SIDEBAR -->
+                    <article>
+                        <div class="article-image"></div>
+                        <div class="article-header">
+                            <span class="category-badge">ACTUALITÉS</span>
+                            <h3>En attente de mise à jour...</h3>
+                            <div class="article-meta">Date de la nouvelle : 22 avril 2026</div>
+                            <p class="article-excerpt">Les données pour cet article se chargeront lors de la prochaine exécution.</p>
+                            <div class="article-footer">
+                                <span class="read-time">Revue de Presse Automatisée</span>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article>
+                        <div class="article-image"></div>
+                        <div class="article-header">
+                            <span class="category-badge">ACTUALITÉS</span>
+                            <h3>En attente de mise à jour...</h3>
+                            <div class="article-meta">Date de la nouvelle : 22 avril 2026</div>
+                            <p class="article-excerpt">Les données pour cet article se chargeront lors de la prochaine exécution.</p>
+                            <div class="article-footer">
+                                <span class="read-time">Revue de Presse Automatisée</span>
+                            </div>
+                        </div>
+                    </article>
+
+            </div>
+        </section>
+
         <aside class="sidebar">
-            <div class="sidebar-box">
-                <h3>À LA UNE</h3>
-                <p>La révolution de l'IA dans la médecine continue de faire les gros titres. Les experts prédisent une transformation majeure du secteur dans les 12 prochains mois.</p>
-            </div>
-
-            <div class="sidebar-box">
-                <h3>MÉTÉO</h3>
-                <p><strong>Montréal:</strong> Ensoleillé, 18°C</p>
-                <p><strong>Québec:</strong> Nuageux, 16°C</p>
-                <p><strong>Gatineau:</strong> Partiellement nuageux, 17°C</p>
-            </div>
-
-            <div class="sidebar-box">
-                <h3>INDICES BOURSIERS</h3>
-                <ul>
-                    <li>TSX: +245 pts ▲</li>
-                    <li>S&P 500: +320 pts ▲</li>
-                    <li>NASDAQ: +185 pts ▲</li>
-                    <li>DJIA: +410 pts ▲</li>
-                </ul>
-            </div>
-
-            <div class="sidebar-box">
-                <h3>ANNONCES</h3>
-                <p style="text-align: center; font-style: italic; color: #666;">
-                    Espace publicitaire
-                </p>
-            </div>
+            <h3>À PROPOS DE CETTE REVUE</h3>
+            <p><strong>Méthodologie :</strong> Revue de presse automatisée et mise à jour quotidiennement (07:00 heure de Québec) via des sources diversifiées : médias traditionnels (Reuters, AFP, BBC, Radio-Canada), sources analytiques (Brookings, Foreign Policy) et institutions.</p>
+            <p><strong>Principe :</strong> Présentation factuelle et neutre des actualités. Aucune opinion éditoriale. Faits, contexte et sources vérifiées.</p>
         </aside>
     </div>
-
-    <footer>
-        <div class="footer-content">
-            <h3>REVUE DE PRESSE QUOTIDIENNE</h3>
-            <p>Votre source fiable d'informations actualisées chaque jour à 07:00 heure de Québec</p>
-            <div class="footer-divider"></div>
-            <p>Technologie | Économie | Sciences | Innovation</p>
-            <div class="footer-divider"></div>
-            <p><strong>© 2026 - Revue de Presse Automatisée</strong> | Tous droits réservés</p>
-        </div>
-    </footer>
 </body>
 </html>
