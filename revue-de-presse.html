@@ -1,4 +1,223 @@
-<!DOCTYPE html>
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Agent de revue de presse quotidienne automatisée avec traduction en français.
+Récupère 15 articles de sources diversifiées, les traduit en français.
+Respecte strictement les critères de neutralité et rigueur analytique.
+"""
+
+import os
+import requests
+import urllib.parse
+from datetime import datetime, timedelta
+from html import escape
+import re
+import time
+
+# Mois en français
+MOIS_FR = [
+    "janvier", "février", "mars", "avril", "mai", "juin",
+    "juillet", "août", "septembre", "octobre", "novembre", "décembre"
+]
+
+def obtenir_date_francaise(date_obj=None):
+    """Retourne la date au format français."""
+    if date_obj is None:
+        date_obj = datetime.now()
+    jour = date_obj.day
+    mois = MOIS_FR[date_obj.month - 1]
+    annee = date_obj.year
+    return f"{jour} {mois} {annee}"
+
+def obtenir_horodatage():
+    """Retourne l'horodatage complet d'exécution."""
+    maintenant = datetime.now()
+    jour = maintenant.day
+    mois = MOIS_FR[maintenant.month - 1]
+    annee = maintenant.year
+    heure = maintenant.strftime("%H:%M:%S")
+    return f"{jour} {mois} {annee} à {heure}"
+
+def traduire_google(texte):
+    """
+    Traduit du texte en français via l'API Google Translate.
+    Méthode gratuite, sans clé d'authentification requise.
+    """
+    if not texte or len(texte) < 2:
+        return texte
+    
+    try:
+        # Encoder le texte
+        texte_encode = urllib.parse.quote(texte[:500])
+        
+        # URL de l'API Google Translate
+        url = f"https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=fr&dt=t&q={texte_encode}"
+        
+        # Faire la requête avec timeout
+        response = requests.get(url, timeout=5)
+        
+        if response.status_code == 200:
+            try:
+                data = response.json()
+                if data and len(data) > 0 and len(data[0]) > 0 and len(data[0][0]) > 0:
+                    traduction = data[0][0][0]
+                    return traduction
+            except:
+                return texte
+        
+        return texte
+    
+    except Exception as e:
+        return texte
+
+def recuperer_articles():
+    """Récupère les articles via NewsAPI."""
+    api_key = os.getenv("NEWSAPI_KEY", "")
+    
+    if not api_key:
+        print("❌ Erreur : NEWSAPI_KEY non configurée.")
+        print("Obtenez une clé gratuite sur https://newsapi.org")
+        exit(1)
+    
+    articles_par_categorie = {
+        "quebec": [],
+        "canada": [],
+        "usa": [],
+        "economy": [],
+        "geopolitics": []
+    }
+    
+    # Configuration des requêtes par catégorie
+    requetes = {
+        "quebec": "Montreal OR Quebec OR (Ville de Quebec)",
+        "canada": "Canada OR Ottawa OR Parliament",
+        "usa": "United States OR Washington OR White House OR Congress",
+        "economy": "economy OR markets OR business OR trading",
+        "geopolitics": "international OR geopolitics OR UN OR diplomacy"
+    }
+    
+    date_hier = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
+    
+    try:
+        for categorie, query in requetes.items():
+            print(f"  📡 Récupération articles {categorie}...")
+            
+            params = {
+                "q": query,
+                "apiKey": api_key,
+                "from": date_hier,
+                "sortBy": "relevancy",
+                "language": "en",
+                "pageSize": 100
+            }
+            
+            response = requests.get(
+                "https://newsapi.org/v2/everything",
+                params=params,
+                timeout=10
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                for article in data.get("articles", []):
+                    # Vérifier la qualité
+                    if (article.get("description") and 
+                        len(article.get("description", "")) > 80 and
+                        article.get("title")):
+                        
+                        articles_par_categorie[categorie].append({
+                            "title": article.get("title", ""),
+                            "description": article.get("description", ""),
+                            "url": article.get("url", ""),
+                            "source": article.get("source", {}).get("name", "Unknown"),
+                            "publishedAt": article.get("publishedAt", "")[:10],
+                        })
+        
+        return articles_par_categorie
+    
+    except requests.exceptions.RequestException as e:
+        print(f"❌ Erreur réseau : {e}")
+        exit(1)
+
+def generer_html(articles_par_categorie):
+    """Génère le HTML avec articles traduits en français."""
+    date_aujourd_hui = obtenir_date_francaise()
+    horodatage = obtenir_horodatage()
+    html_articles = ""
+    numero = 1
+    
+    # Ordre équilibré
+    ordre = ["canada", "quebec", "usa", "economy", "geopolitics"]
+    articles_selectionnes = []
+    
+    # Sélectionner 3 articles par catégorie
+    for cat in ordre:
+        for article in articles_par_categorie.get(cat, [])[:3]:
+            articles_selectionnes.append((cat, article))
+    
+    print(f"\n🌐 Traduction des articles en français...")
+    
+    # Générer les articles
+    for idx, (categorie, article) in enumerate(articles_selectionnes[:15]):
+        # Traduction avec affichage du statut
+        titre_en = article.get("title", "Sans titre")
+        desc_en = article.get("description", "")
+        
+        print(f"  [{idx+1}/15] Traduction: {titre_en[:60]}...")
+        
+        titre_fr = traduire_google(titre_en)
+        time.sleep(0.2)  # Éviter les limites de taux
+        desc_fr = traduire_google(desc_en)
+        
+        source = escape(article.get("source", "Unknown"))
+        date_article = article.get("publishedAt", "")
+        
+        # Mapper catégorie
+        labels = {
+            "quebec": "QUÉBEC",
+            "canada": "CANADA",
+            "usa": "ÉTATS-UNIS",
+            "economy": "ÉCONOMIE",
+            "geopolitics": "GÉOPOLITIQUE"
+        }
+        
+        html_articles += f"""
+                    <article>
+                        <div class="article-image"></div>
+                        <div class="article-header">
+                            <span class="category-badge">{labels.get(categorie, "GÉNÉRAL")}</span>
+                            <h3>{escape(titre_fr)}</h3>
+                            <div class="article-meta">Date de la nouvelle : {date_article}</div>
+                            <p class="article-excerpt">{escape(desc_fr[:250])}...</p>
+                            <div class="article-footer">
+                                <span class="read-time">Source : {source}</span>
+                            </div>
+                        </div>
+                    </article>
+"""
+        numero += 1
+    
+    # Remplir jusqu'à 15
+    while numero <= 15:
+        html_articles += f"""
+                    <article>
+                        <div class="article-image"></div>
+                        <div class="article-header">
+                            <span class="category-badge">ACTUALITÉS</span>
+                            <h3>En attente de données...</h3>
+                            <div class="article-meta">Date de la nouvelle : {date_aujourd_hui}</div>
+                            <p class="article-excerpt">Les données pour cet article se chargeront lors de la prochaine exécution.</p>
+                            <div class="article-footer">
+                                <span class="read-time">Revue de Presse Automatisée</span>
+                            </div>
+                        </div>
+                    </article>
+"""
+        numero += 1
+    
+    # Template HTML
+    html = f"""<!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
@@ -7,25 +226,25 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Courier+Prime:wght@400;700&display=swap');
 
-        * {
+        * {{
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-        }
+        }}
 
-        html {
+        html {{
             scroll-behavior: smooth;
-        }
+        }}
 
-        body {
+        body {{
             font-family: 'Courier Prime', monospace;
             line-height: 1.6;
             color: #1a1a1a;
             background-color: #e8e4d0;
             padding: 15px;
-        }
+        }}
 
-        header {
+        header {{
             background-color: #fff8f0;
             border: 6px solid #1a1a1a;
             border-top: 12px solid #1a1a1a;
@@ -34,11 +253,10 @@
             text-align: center;
             margin-bottom: 0;
             box-shadow: 5px 5px 0px rgba(0, 0, 0, 0.2);
-            max-width: 100%;
             position: relative;
-        }
+        }}
 
-        header::before {
+        header::before {{
             content: '';
             position: absolute;
             top: 45px;
@@ -47,14 +265,14 @@
             height: 2px;
             background: #1a1a1a;
             box-shadow: 0 4px 0 #1a1a1a, 0 8px 0 #1a1a1a;
-        }
+        }}
 
-        header .content {
+        header .content {{
             position: relative;
             z-index: 1;
-        }
+        }}
 
-        header h1 {
+        header h1 {{
             font-family: 'Playfair Display', serif;
             font-size: 4.5em;
             font-weight: 900;
@@ -64,9 +282,9 @@
             color: #1a1a1a;
             line-height: 1;
             text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.1);
-        }
+        }}
 
-        header .subtitle {
+        header .subtitle {{
             font-family: 'Courier Prime', monospace;
             font-size: 1.2em;
             margin: 10px 0;
@@ -74,17 +292,17 @@
             color: #333;
             letter-spacing: 3px;
             text-transform: uppercase;
-        }
+        }}
 
-        header .tagline {
+        header .tagline {{
             font-style: italic;
             font-size: 0.9em;
             color: #555;
             margin: 8px 0 15px 0;
             letter-spacing: 1px;
-        }
+        }}
 
-        header .date-banner {
+        header .date-banner {{
             display: inline-block;
             padding: 8px 20px;
             border: 3px solid #1a1a1a;
@@ -94,16 +312,16 @@
             font-weight: bold;
             margin-top: 15px;
             letter-spacing: 2px;
-        }
+        }}
 
-        header .date-banner strong {
+        header .date-banner strong {{
             color: #1a1a1a;
             display: inline;
             font-weight: bold;
             margin-left: 8px;
-        }
+        }}
 
-        header .info-row {
+        header .info-row {{
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -114,13 +332,18 @@
             font-family: 'Courier Prime', monospace;
             font-size: 0.95em;
             font-weight: bold;
-        }
+        }}
 
-        header .info-row span {
-            letter-spacing: 1px;
-        }
+        header .timestamp {{
+            font-size: 0.85em;
+            color: #666;
+            font-style: italic;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px dashed #1a1a1a;
+        }}
 
-        nav {
+        nav {{
             background: #1a1a1a;
             padding: 12px 30px;
             display: flex;
@@ -128,9 +351,9 @@
             gap: 40px;
             flex-wrap: wrap;
             border-bottom: 8px solid #333;
-        }
+        }}
 
-        nav span {
+        nav span {{
             color: #fff8f0;
             font-weight: bold;
             font-size: 0.9em;
@@ -138,27 +361,23 @@
             letter-spacing: 2px;
             font-family: 'Courier Prime', monospace;
             padding: 4px 8px;
-        }
+        }}
 
-        .container {
+        .container {{
             max-width: 100%;
             margin: 0;
             background: #fff8f0;
             padding: 30px;
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 30px;
             border-left: 8px solid #1a1a1a;
             border-right: 8px solid #1a1a1a;
-        }
+        }}
 
-        .articles-section h2 {
+        .articles-section h2 {{
             font-family: 'Playfair Display', serif;
             font-size: 2em;
             color: #1a1a1a;
             margin-bottom: 20px;
             text-align: left;
-            position: relative;
             padding-bottom: 12px;
             font-weight: 900;
             text-transform: uppercase;
@@ -166,15 +385,15 @@
             border-bottom: 4px double #1a1a1a;
             border-top: 2px solid #1a1a1a;
             padding-top: 12px;
-        }
+        }}
 
-        .articles-grid {
+        .articles-grid {{
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 20px;
-        }
+        }}
 
-        article {
+        article {{
             background: #fff8f0;
             border: 3px solid #1a1a1a;
             overflow: hidden;
@@ -183,14 +402,14 @@
             flex-direction: column;
             height: 100%;
             box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.12);
-        }
+        }}
 
-        article:hover {
+        article:hover {{
             transform: translate(3px, 3px);
             box-shadow: 0 0 0px rgba(0, 0, 0, 0.12);
-        }
+        }}
 
-        article .article-image {
+        article .article-image {{
             height: 160px;
             background: linear-gradient(45deg, #d4d0c8 25%, transparent 25%, transparent 75%, #d4d0c8 75%, #d4d0c8),
                         linear-gradient(45deg, #d4d0c8 25%, transparent 25%, transparent 75%, #d4d0c8 75%, #d4d0c8);
@@ -207,22 +426,22 @@
             padding: 12px;
             font-family: 'Courier Prime', monospace;
             font-weight: bold;
-        }
+        }}
 
-        article .article-image::before {
+        article .article-image::before {{
             content: '[PHOTO]';
             letter-spacing: 1px;
-        }
+        }}
 
-        article .article-header {
+        article .article-header {{
             padding: 15px;
             flex-grow: 1;
             display: flex;
             flex-direction: column;
             border-bottom: 2px dashed #1a1a1a;
-        }
+        }}
 
-        article .category-badge {
+        article .category-badge {{
             display: inline-block;
             background: #f0f0e8;
             color: #1a1a1a;
@@ -235,9 +454,9 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             font-family: 'Courier Prime', monospace;
-        }
+        }}
 
-        article h3 {
+        article h3 {{
             font-family: 'Playfair Display', serif;
             font-size: 1.2em;
             color: #1a1a1a;
@@ -247,9 +466,9 @@
             font-weight: 900;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-        }
+        }}
 
-        article .article-meta {
+        article .article-meta {{
             color: #333;
             font-weight: bold;
             font-size: 0.75em;
@@ -257,9 +476,9 @@
             font-family: 'Courier Prime', monospace;
             letter-spacing: 1px;
             text-transform: uppercase;
-        }
+        }}
 
-        article .article-excerpt {
+        article .article-excerpt {{
             color: #1a1a1a;
             font-size: 0.9em;
             line-height: 1.6;
@@ -267,29 +486,29 @@
             flex-grow: 1;
             text-align: justify;
             font-family: 'Courier Prime', monospace;
-        }
+        }}
 
-        article .article-footer {
+        article .article-footer {{
             padding: 10px 0;
             font-size: 0.8em;
-        }
+        }}
 
-        article .read-time {
+        article .read-time {{
             color: #666;
             font-style: italic;
             font-family: 'Courier Prime', monospace;
             font-weight: bold;
-        }
+        }}
 
-        .sidebar {
+        .sidebar {{
             background: #f0f0e8;
             border: 3px double #1a1a1a;
             padding: 15px;
             margin-top: 20px;
             box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.1);
-        }
+        }}
 
-        .sidebar h3 {
+        .sidebar h3 {{
             font-family: 'Playfair Display', serif;
             font-size: 1.3em;
             color: #1a1a1a;
@@ -299,40 +518,51 @@
             border-bottom: 2px solid #1a1a1a;
             padding-bottom: 8px;
             letter-spacing: 1px;
-        }
+        }}
 
-        .sidebar p {
+        .sidebar p {{
             font-family: 'Courier Prime', monospace;
             font-size: 0.9em;
             color: #1a1a1a;
             margin-bottom: 8px;
             line-height: 1.6;
             text-align: justify;
-        }
+        }}
 
-        @media (max-width: 768px) {
-            header h1 {
+        .update-timestamp {{
+            background: #e8e4d0;
+            border: 1px solid #1a1a1a;
+            padding: 10px;
+            margin-top: 15px;
+            text-align: center;
+            font-size: 0.85em;
+            font-style: italic;
+            color: #666;
+        }}
+
+        @media (max-width: 768px) {{
+            header h1 {{
                 font-size: 3em;
-            }
-            .articles-grid {
+            }}
+            .articles-grid {{
                 grid-template-columns: 1fr;
-            }
-        }
+            }}
+        }}
 
-        @keyframes slideInUp {
-            from {
+        @keyframes slideInUp {{
+            from {{
                 opacity: 0;
                 transform: translateY(15px);
-            }
-            to {
+            }}
+            to {{
                 opacity: 1;
                 transform: translateY(0);
-            }
-        }
+            }}
+        }}
 
-        article {
+        article {{
             animation: slideInUp 0.6s ease-out;
-        }
+        }}
     </style>
 </head>
 <body>
@@ -342,11 +572,14 @@
             <p class="subtitle">ÉDITION QUOTIDIENNE</p>
             <p class="tagline">~ Actualités et tendances du jour ~</p>
             <div class="info-row">
-                <span>Québec</span>
+                <span>MONTRÉAL - QUÉBEC</span>
                 <div class="date-banner">
-                    Édition du <strong>Date du jour : 22 avril 2026</strong>
+                    Édition du <strong>Date du jour : {date_aujourd_hui}</strong>
                 </div>
                 <span>AUTOMATISÉE</span>
+            </div>
+            <div class="timestamp">
+                🕐 Mise à jour le {horodatage}
             </div>
         </div>
     </header>
@@ -363,211 +596,51 @@
         <section class="articles-section">
             <h2>ACTUALITÉS DU JOUR - 15 POINTS CLÉS</h2>
             <div class="articles-grid">
-
-                    <article>
-                        <div class="article-image"></div>
-                        <div class="article-header">
-                            <span class="category-badge">CANADA</span>
-                            <h3>Ex-parliamentary employee arrested under anti-hacking law</h3>
-                            <div class="article-meta">Date de la nouvelle : 2026-04-21</div>
-                            <p class="article-excerpt">A 40-year-old man was arrested at an address in Coventry by counter terrorism detectives, the Metropolitan Police said.</p>
-                            <div class="article-footer">
-                                <span class="read-time">Source : BBC News</span>
-                            </div>
-                        </div>
-                    </article>
-
-                    <article>
-                        <div class="article-image"></div>
-                        <div class="article-header">
-                            <span class="category-badge">CANADA</span>
-                            <h3>Gunman shoots several tourists at historic pyramids in Mexico</h3>
-                            <div class="article-meta">Date de la nouvelle : 2026-04-21</div>
-                            <p class="article-excerpt">A man standing atop one of the historic Teotihuacan pyramids opened fire on tourists Monday, killing one Canadian and leaving at least 13 people, authorities said.</p>
-                            <div class="article-footer">
-                                <span class="read-time">Source : NPR</span>
-                            </div>
-                        </div>
-                    </article>
-
-                    <article>
-                        <div class="article-image"></div>
-                        <div class="article-header">
-                            <span class="category-badge">CANADA</span>
-                            <h3>Google&#x27;s Internal Politics Leave It Playing Catch-Up On AI Coding</h3>
-                            <div class="article-meta">Date de la nouvelle : 2026-04-21</div>
-                            <p class="article-excerpt">An anonymous reader quotes a report from Bloomberg: At Google, leaders are anxious about falling behind in the race to offer AI coding tools, especially as rivals like Anthropic PBC offer more effective and popular tools to businesses, according to people fam…</p>
-                            <div class="article-footer">
-                                <span class="read-time">Source : Slashdot.org</span>
-                            </div>
-                        </div>
-                    </article>
-
-                    <article>
-                        <div class="article-image"></div>
-                        <div class="article-header">
-                            <span class="category-badge">ÉTATS-UNIS</span>
-                            <h3>Another Trump Cabinet Member Is Out</h3>
-                            <div class="article-meta">Date de la nouvelle : 2026-04-21</div>
-                            <p class="article-excerpt">Lori Chavez-DeRemer was supposed to take the GOP in a more worker-friendly direction. Instead she is departing amid scandal.</p>
-                            <div class="article-footer">
-                                <span class="read-time">Source : The Atlantic</span>
-                            </div>
-                        </div>
-                    </article>
-
-                    <article>
-                        <div class="article-image"></div>
-                        <div class="article-header">
-                            <span class="category-badge">ÉTATS-UNIS</span>
-                            <h3>U.S. Personnel Who Died in Mexico Were Working For the CIA, Sources Say</h3>
-                            <div class="article-meta">Date de la nouvelle : 2026-04-21</div>
-                            <p class="article-excerpt">Two Americans killed in Mexico, previously identified only as “staff from the United States Embassy,” participated in a raid on a drug lab.
-The post U.S. Personnel Who Died in Mexico Were Working For the CIA, Sources Say appeared first on The Intercept.</p>
-                            <div class="article-footer">
-                                <span class="read-time">Source : The Intercept</span>
-                            </div>
-                        </div>
-                    </article>
-
-                    <article>
-                        <div class="article-image"></div>
-                        <div class="article-header">
-                            <span class="category-badge">ÉTATS-UNIS</span>
-                            <h3>Iran-US war: Four scenarios for what’s next as talks stumble</h3>
-                            <div class="article-meta">Date de la nouvelle : 2026-04-21</div>
-                            <p class="article-excerpt">Between an expiring ceasefire and a possible deal lies a range of ways in which the war could proceed, analysts say.</p>
-                            <div class="article-footer">
-                                <span class="read-time">Source : Al Jazeera English</span>
-                            </div>
-                        </div>
-                    </article>
-
-                    <article>
-                        <div class="article-image"></div>
-                        <div class="article-header">
-                            <span class="category-badge">ÉCONOMIE</span>
-                            <h3>What smart people are saying about the future of the Fed under Kevin Warsh</h3>
-                            <div class="article-meta">Date de la nouvelle : 2026-04-21</div>
-                            <p class="article-excerpt">With concerns over Fed independence, Trump nominee Kevin Warsh could still face an uphill battle in the Senate.</p>
-                            <div class="article-footer">
-                                <span class="read-time">Source : Business Insider</span>
-                            </div>
-                        </div>
-                    </article>
-
-                    <article>
-                        <div class="article-image"></div>
-                        <div class="article-header">
-                            <span class="category-badge">ÉCONOMIE</span>
-                            <h3>AI, sock puppets, and the richest Fed chair in history: 3 takeaways from Kevin Warsh&#x27;s confirmation hearings</h3>
-                            <div class="article-meta">Date de la nouvelle : 2026-04-21</div>
-                            <p class="article-excerpt">Former Wall Street exec Kevin Warsh testified before Congress Tuesday about his nomination as Fed chair.</p>
-                            <div class="article-footer">
-                                <span class="read-time">Source : Business Insider</span>
-                            </div>
-                        </div>
-                    </article>
-
-                    <article>
-                        <div class="article-image"></div>
-                        <div class="article-header">
-                            <span class="category-badge">ÉCONOMIE</span>
-                            <h3>Tim Cook&#x27;s Legacy Is Turning Apple Into a Subscription</h3>
-                            <div class="article-meta">Date de la nouvelle : 2026-04-21</div>
-                            <p class="article-excerpt">The soon-to-exit Apple CEO went all in on services. Now, the incoming CEO, John Ternus, will need to embrace the AI era.</p>
-                            <div class="article-footer">
-                                <span class="read-time">Source : Wired</span>
-                            </div>
-                        </div>
-                    </article>
-
-                    <article>
-                        <div class="article-image"></div>
-                        <div class="article-header">
-                            <span class="category-badge">GÉOPOLITIQUE</span>
-                            <h3>Global Growth In Solar &#x27;the Largest Ever Observed For Any Source&#x27;</h3>
-                            <div class="article-meta">Date de la nouvelle : 2026-04-21</div>
-                            <p class="article-excerpt">The IEA says 2025 marked a turning point for global energy, with solar posting the largest growth ever seen for any energy source and helping carbon-free power outpace rising demand. The trend led the agency to declare that the world has entered the &quot;Age of E…</p>
-                            <div class="article-footer">
-                                <span class="read-time">Source : Slashdot.org</span>
-                            </div>
-                        </div>
-                    </article>
-
-                    <article>
-                        <div class="article-image"></div>
-                        <div class="article-header">
-                            <span class="category-badge">GÉOPOLITIQUE</span>
-                            <h3>‘The Omen’ Remains a Searing Reminder That No Good Deed Goes Unpunished</h3>
-                            <div class="article-meta">Date de la nouvelle : 2026-04-21</div>
-                            <p class="article-excerpt">Everyone remembers the creepy kid at the center of the 1976 horror classic—but he’s only part of the problem.</p>
-                            <div class="article-footer">
-                                <span class="read-time">Source : Gizmodo.com</span>
-                            </div>
-                        </div>
-                    </article>
-
-                    <article>
-                        <div class="article-image"></div>
-                        <div class="article-header">
-                            <span class="category-badge">GÉOPOLITIQUE</span>
-                            <h3>Endless Legend 2&#x27;s answer to the common 4X problem of &quot;goldfish&quot; AI is a cunning system of badges, from Pleasant to Bully</h3>
-                            <div class="article-meta">Date de la nouvelle : 2026-04-21</div>
-                            <p class="article-excerpt">The least involving part of any 4X strategy is very often diplomacy with AI civilizations. Even Endless Legend 2, a game with a faction of coral people who can make other people like them by infesting their territory with spores, does settle into a formula. Y…</p>
-                            <div class="article-footer">
-                                <span class="read-time">Source : Rock Paper Shotgun</span>
-                            </div>
-                        </div>
-                    </article>
-
-                    <article>
-                        <div class="article-image"></div>
-                        <div class="article-header">
-                            <span class="category-badge">ACTUALITÉS</span>
-                            <h3>En attente de mise à jour...</h3>
-                            <div class="article-meta">Date de la nouvelle : 22 avril 2026</div>
-                            <p class="article-excerpt">Les données pour cet article se chargeront lors de la prochaine exécution.</p>
-                            <div class="article-footer">
-                                <span class="read-time">Revue de Presse Automatisée</span>
-                            </div>
-                        </div>
-                    </article>
-
-                    <article>
-                        <div class="article-image"></div>
-                        <div class="article-header">
-                            <span class="category-badge">ACTUALITÉS</span>
-                            <h3>En attente de mise à jour...</h3>
-                            <div class="article-meta">Date de la nouvelle : 22 avril 2026</div>
-                            <p class="article-excerpt">Les données pour cet article se chargeront lors de la prochaine exécution.</p>
-                            <div class="article-footer">
-                                <span class="read-time">Revue de Presse Automatisée</span>
-                            </div>
-                        </div>
-                    </article>
-
-                    <article>
-                        <div class="article-image"></div>
-                        <div class="article-header">
-                            <span class="category-badge">ACTUALITÉS</span>
-                            <h3>En attente de mise à jour...</h3>
-                            <div class="article-meta">Date de la nouvelle : 22 avril 2026</div>
-                            <p class="article-excerpt">Les données pour cet article se chargeront lors de la prochaine exécution.</p>
-                            <div class="article-footer">
-                                <span class="read-time">Revue de Presse Automatisée</span>
-                            </div>
-                        </div>
-                    </article>
-
+{html_articles}
             </div>
         </section>
 
         <aside class="sidebar">
             <h3>À PROPOS DE CETTE REVUE</h3>
-            <p><strong>Méthodologie :</strong> Revue de presse automatisée et mise à jour quotidiennement (07:00 heure de Québec) via des sources diversifiées : médias traditionnels (Reuters, AFP, BBC, Radio-Canada), sources analytiques (Brookings, Foreign Policy) et institutions.</p>
-            <p><strong>Principe :</strong> Présentation factuelle et neutre des actualités. Aucune opinion éditoriale. Faits, contexte et sources vérifiées.</p>
+            <p><strong>Traduction automatique :</strong> Tous les articles sont traduits en français via Google Translate.</p>
+            <p><strong>Mise à jour :</strong> Quotidienne à 07:00 heure de Québec avec sources diversifiées.</p>
+            <p><strong>Dernière exécution :</strong> {horodatage}</p>
+            <div class="update-timestamp">
+                ✓ Revue générée le {horodatage}
+            </div>
         </aside>
     </div>
 </body>
 </html>
+"""
+    
+    return html
+
+def main():
+    """Fonction principale."""
+    print("\n" + "="*50)
+    print("🗞️  REVUE DE PRESSE AUTOMATISÉE")
+    print("="*50)
+    print(f"🕐 Exécution lancée le {obtenir_horodatage()}")
+    print("="*50)
+    
+    print("\n📰 Récupération des articles...")
+    articles = recuperer_articles()
+    
+    print("\n✏️  Génération du HTML...")
+    html_content = generer_html(articles)
+    
+    print("\n💾 Sauvegarde du fichier...")
+    try:
+        with open("revue-de-presse.html", "w", encoding="utf-8") as f:
+            f.write(html_content)
+        print(f"\n✅ Succès! Revue mise à jour : {obtenir_date_francaise()}")
+        print(f"🕐 Horodatage : {obtenir_horodatage()}")
+        print("="*50)
+        exit(0)
+    except Exception as e:
+        print(f"\n❌ Erreur : {e}")
+        exit(1)
+
+if __name__ == "__main__":
+    main()
