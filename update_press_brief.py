@@ -2,8 +2,9 @@
 # -*- coding: utf-8 -*-
 """
 Agent de revue de presse quotidienne automatisée avec traduction en français.
-Récupère 15 articles de sources diversifiées, les traduit en français.
-Respecte strictement les critères de neutralité et rigueur analytique.
+Récupère 15 articles de sources diversifiées et crédibles.
+Catégories prioritaires : Ville de Québec, Province de Québec, Canada, 
+Politique États-Unis, Enjeux Internationaux, Géopolitique.
 """
 
 import os
@@ -29,155 +30,260 @@ def obtenir_date_francaise(date_obj=None):
     annee = date_obj.year
     return f"{jour} {mois} {annee}"
 
+def obtenir_horodatage():
+    """Retourne l'horodatage complet d'exécution."""
+    maintenant = datetime.now()
+    jour = maintenant.day
+    mois = MOIS_FR[maintenant.month - 1]
+    annee = maintenant.year
+    heure = maintenant.strftime("%H:%M:%S")
+    return f"{jour} {mois} {annee} à {heure}"
+
 def traduire_google(texte):
-    """
-    Traduit du texte en français via l'API Google Translate.
-    Méthode gratuite, sans clé d'authentification requise.
-    """
+    """Traduit du texte en français via Google Translate."""
     if not texte or len(texte) < 2:
         return texte
     
     try:
-        # Encoder le texte
         texte_encode = urllib.parse.quote(texte[:500])
-        
-        # URL de l'API Google Translate
         url = f"https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=fr&dt=t&q={texte_encode}"
-        
-        # Faire la requête avec timeout
         response = requests.get(url, timeout=5)
         
         if response.status_code == 200:
             try:
                 data = response.json()
                 if data and len(data) > 0 and len(data[0]) > 0 and len(data[0][0]) > 0:
-                    traduction = data[0][0][0]
-                    return traduction
+                    return data[0][0][0]
             except:
                 return texte
         
         return texte
-    
-    except Exception as e:
-        print(f"  ⚠ Traduction échouée, texte original conservé")
+    except:
         return texte
 
+def filtrer_articles(articles, mots_cles_exclure=None):
+    """
+    Filtre les articles pour exclure le contenu non pertinent.
+    Exclut notamment les articles sportifs et le contenu faible.
+    """
+    if mots_cles_exclure is None:
+        mots_cles_exclure = [
+            'sport', 'football', 'hockey', 'baseball', 'basketball', 'nfl', 'nba', 'nhl',
+            'mma', 'boxing', 'wrestling', 'tennis', 'golf', 'soccer', 'rugby',
+            'transfert', 'match', 'équipe', 'joueur', 'entraîneur', 'coach',
+            'victoire', 'défaite', 'score', 'but', 'panier', 'essai',
+            'ligue', 'coupe', 'championnat', 'tournoi', 'olympique',
+            'célébrity gossip', 'entertainment', 'showbiz', 'actor', 'movie',
+            'award', 'festival', 'concert', 'singer', 'album'
+        ]
+    
+    articles_filtres = []
+    for article in articles:
+        titre = article.get("title", "").lower()
+        description = article.get("description", "").lower()
+        
+        # Vérifier si c'est du contenu à exclure
+        est_exclu = any(mot in titre or mot in description for mot in mots_cles_exclure)
+        
+        # Vérifier la qualité minimale
+        a_contenu_suffisant = (
+            article.get("description") and 
+            len(article.get("description", "")) > 80 and
+            article.get("title") and
+            len(article.get("title", "")) > 15
+        )
+        
+        if not est_exclu and a_contenu_suffisant:
+            articles_filtres.append(article)
+    
+    return articles_filtres
+
 def recuperer_articles():
-    """Récupère les articles via NewsAPI."""
+    """
+    Récupère les articles avec les priorités suivantes :
+    1. Ville de Québec (3 articles)
+    2. Province de Québec (3 articles)
+    3. Canada (2 articles)
+    4. Politique États-Unis (2 articles)
+    5. Enjeux Internationaux majeurs (3 articles)
+    6. Géopolitique (2 articles)
+    """
     api_key = os.getenv("NEWSAPI_KEY", "")
     
     if not api_key:
         print("❌ Erreur : NEWSAPI_KEY non configurée.")
-        print("Obtenez une clé gratuite sur https://newsapi.org")
         exit(1)
     
-    articles_par_categorie = {
-        "quebec": [],
-        "canada": [],
-        "usa": [],
-        "economy": [],
-        "geopolitics": []
+    # Configuration des requêtes par priorité
+    categories = {
+        "quebec_ville": {
+            "queries": [
+                "Quebec City government",
+                "Ville de Quebec policy",
+                "Quebec City municipal",
+                "Montreal downtown development",
+                "City of Montreal council"
+            ],
+            "count": 3,
+            "label": "VILLE DE QUÉBEC"
+        },
+        "quebec_province": {
+            "queries": [
+                "Quebec government policy",
+                "Province of Quebec legislation",
+                "Quebec National Assembly",
+                "Assemblée nationale Quebec",
+                "Quebec provincial budget"
+            ],
+            "count": 3,
+            "label": "PROVINCE DE QUÉBEC"
+        },
+        "canada": {
+            "queries": [
+                "Canadian parliament",
+                "Canada federal government",
+                "Ottawa parliament",
+                "Prime Minister Canada",
+                "Canadian economy policy"
+            ],
+            "count": 2,
+            "label": "CANADA"
+        },
+        "usa_politics": {
+            "queries": [
+                "US politics",
+                "White House",
+                "Congress",
+                "Senate",
+                "Trump Biden presidency"
+            ],
+            "count": 2,
+            "label": "ÉTATS-UNIS"
+        },
+        "international": {
+            "queries": [
+                "Middle East conflict",
+                "Ukraine Russia war",
+                "China Taiwan",
+                "Europe politics",
+                "International crisis"
+            ],
+            "count": 3,
+            "label": "INTERNATIONAL"
+        },
+        "geopolitique": {
+            "queries": [
+                "geopolitics",
+                "UN UN security council",
+                "International relations",
+                "NATO",
+                "Trump Putin"
+            ],
+            "count": 2,
+            "label": "GÉOPOLITIQUE"
+        }
     }
     
-    # Configuration des requêtes par catégorie
-    requetes = {
-        "quebec": "(Quebec province) OR (Ville de Quebec)",
-        "canada": "Canada or (Canada politic)",
-        "usa": "United States politic",
-        "economy": "economy OR business",
-        "geopolitics": "international OR (world geopolitics)"
-    }
-    
-    date_hier = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
+    articles_par_categorie = {}
+    date_hier = (datetime.now() - timedelta(days=2)).strftime("%Y-%m-%d")
     
     try:
-        for categorie, query in requetes.items():
-            print(f"  📡 Récupération articles {categorie}...")
+        for categorie, config in categories.items():
+            print(f"  📡 Récupération {config['label']}...")
+            articles_par_categorie[categorie] = []
             
-            params = {
-                "q": query,
-                "apiKey": api_key,
-                "from": date_hier,
-                "sortBy": "relevancy",
-                "language": "en",
-                "pageSize": 100
-            }
+            for query in config["queries"]:
+                params = {
+                    "q": query,
+                    "apiKey": api_key,
+                    "from": date_hier,
+                    "sortBy": "relevancy",
+                    "language": "en",
+                    "pageSize": 50
+                }
+                
+                try:
+                    response = requests.get(
+                        "https://newsapi.org/v2/everything",
+                        params=params,
+                        timeout=10
+                    )
+                    
+                    if response.status_code == 200:
+                        data = response.json()
+                        articles_par_categorie[categorie].extend(
+                            data.get("articles", [])
+                        )
+                except requests.exceptions.RequestException:
+                    continue
             
-            response = requests.get(
-                "https://newsapi.org/v2/everything",
-                params=params,
-                timeout=10
+            # Filtrer et dédupliquer
+            articles_par_categorie[categorie] = filtrer_articles(
+                articles_par_categorie[categorie]
             )
             
-            if response.status_code == 200:
-                data = response.json()
-                
-                for article in data.get("articles", []):
-                    # Vérifier la qualité
-                    if (article.get("description") and 
-                        len(article.get("description", "")) > 80 and
-                        article.get("title")):
-                        
-                        articles_par_categorie[categorie].append({
-                            "title": article.get("title", ""),
-                            "description": article.get("description", ""),
-                            "url": article.get("url", ""),
-                            "source": article.get("source", {}).get("name", "Unknown"),
-                            "publishedAt": article.get("publishedAt", "")[:10],
-                        })
+            # Dédupliquer par titre
+            titres_vus = set()
+            articles_uniques = []
+            for article in articles_par_categorie[categorie]:
+                titre = article.get("title", "").lower()
+                if titre not in titres_vus:
+                    articles_uniques.append(article)
+                    titres_vus.add(titre)
+            
+            articles_par_categorie[categorie] = articles_uniques[:config["count"] * 2]
         
         return articles_par_categorie
     
-    except requests.exceptions.RequestException as e:
-        print(f"❌ Erreur réseau : {e}")
+    except Exception as e:
+        print(f"❌ Erreur : {e}")
         exit(1)
 
 def generer_html(articles_par_categorie):
     """Génère le HTML avec articles traduits en français."""
     date_aujourd_hui = obtenir_date_francaise()
+    horodatage = obtenir_horodatage()
     html_articles = ""
     numero = 1
     
-    # Ordre équilibré
-    ordre = ["canada", "quebec", "usa", "economy", "geopolitics"]
+    # Configuration des catégories avec labels
+    categories_ordre = [
+        ("quebec_ville", "VILLE DE QUÉBEC", 3),
+        ("quebec_province", "PROVINCE DE QUÉBEC", 3),
+        ("canada", "CANADA", 2),
+        ("usa_politics", "ÉTATS-UNIS", 2),
+        ("international", "INTERNATIONAL", 3),
+        ("geopolitique", "GÉOPOLITIQUE", 2)
+    ]
+    
     articles_selectionnes = []
     
-    # Sélectionner 3 articles par catégorie
-    for cat in ordre:
-        for article in articles_par_categorie.get(cat, [])[:3]:
-            articles_selectionnes.append((cat, article))
+    # Sélectionner les articles par catégorie
+    for cat_key, label, count in categories_ordre:
+        for article in articles_par_categorie.get(cat_key, [])[:count]:
+            articles_selectionnes.append((label, article))
     
-    print(f"\n🌐 Traduction des articles en français...")
+    print(f"\n🌐 Traduction des {len(articles_selectionnes[:15])} articles...")
     
     # Générer les articles
-    for idx, (categorie, article) in enumerate(articles_selectionnes[:15]):
-        # Traduction avec affichage du statut
+    for idx, (label, article) in enumerate(articles_selectionnes[:15]):
         titre_en = article.get("title", "Sans titre")
         desc_en = article.get("description", "")
         
-        print(f"  [{idx+1}/15] Traduction: {titre_en[:60]}...")
+        print(f"  [{idx+1}/15] {label}: {titre_en[:50]}...")
         
         titre_fr = traduire_google(titre_en)
-        time.sleep(0.2)  # Éviter les limites de taux
+        time.sleep(0.3)
         desc_fr = traduire_google(desc_en)
         
-        source = escape(article.get("source", "Unknown"))
-        date_article = article.get("publishedAt", "")
-        
-        # Mapper catégorie
-        labels = {
-            "quebec": "QUÉBEC",
-            "canada": "CANADA",
-            "usa": "ÉTATS-UNIS",
-            "economy": "ÉCONOMIE",
-            "geopolitics": "GÉOPOLITIQUE"
-        }
+        source = escape(article.get("source", {}).get("name", "Unknown"))
+        date_article = article.get("publishedAt", "")[:10]
         
         html_articles += f"""
                     <article>
                         <div class="article-image"></div>
                         <div class="article-header">
-                            <span class="category-badge">{labels.get(categorie, "GÉNÉRAL")}</span>
+                            <span class="category-badge">{label}</span>
                             <h3>{escape(titre_fr)}</h3>
                             <div class="article-meta">Date de la nouvelle : {date_article}</div>
                             <p class="article-excerpt">{escape(desc_fr[:250])}...</p>
@@ -207,7 +313,7 @@ def generer_html(articles_par_categorie):
 """
         numero += 1
     
-    # Template HTML
+    # Template HTML complet
     html = f"""<!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -323,6 +429,15 @@ def generer_html(articles_par_categorie):
             font-family: 'Courier Prime', monospace;
             font-size: 0.95em;
             font-weight: bold;
+        }}
+
+        header .timestamp {{
+            font-size: 0.85em;
+            color: #666;
+            font-style: italic;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px dashed #1a1a1a;
         }}
 
         nav {{
@@ -511,6 +626,17 @@ def generer_html(articles_par_categorie):
             text-align: justify;
         }}
 
+        .update-timestamp {{
+            background: #e8e4d0;
+            border: 1px solid #1a1a1a;
+            padding: 10px;
+            margin-top: 15px;
+            text-align: center;
+            font-size: 0.85em;
+            font-style: italic;
+            color: #666;
+        }}
+
         @media (max-width: 768px) {{
             header h1 {{
                 font-size: 3em;
@@ -549,6 +675,9 @@ def generer_html(articles_par_categorie):
                 </div>
                 <span>AUTOMATISÉE</span>
             </div>
+            <div class="timestamp">
+                🕐 Mise à jour le {horodatage}
+            </div>
         </div>
     </header>
 
@@ -556,7 +685,7 @@ def generer_html(articles_par_categorie):
         <span>QUÉBEC</span>
         <span>CANADA</span>
         <span>ÉTATS-UNIS</span>
-        <span>ÉCONOMIE</span>
+        <span>INTERNATIONAL</span>
         <span>GÉOPOLITIQUE</span>
     </nav>
 
@@ -570,8 +699,14 @@ def generer_html(articles_par_categorie):
 
         <aside class="sidebar">
             <h3>À PROPOS DE CETTE REVUE</h3>
-            <p><strong>Traduction automatique :</strong> Tous les articles sont traduits en français via Google Translate.</p>
-            <p><strong>Mise à jour :</strong> Quotidienne à 07:00 heure de Québec avec sources diversifiées.</p>
+            <p><strong>Priorités de couverture :</strong></p>
+            <p>1. Ville de Québec • 2. Province de Québec • 3. Canada • 4. Politique États-Unis • 5. Enjeux Internationaux • 6. Géopolitique</p>
+            <p><strong>Traduction :</strong> Tous les articles sont traduits en français via Google Translate.</p>
+            <p><strong>Mise à jour :</strong> Quotidienne à 07:00 heure de Québec avec sources crédibles.</p>
+            <p><strong>Dernière exécution :</strong> {horodatage}</p>
+            <div class="update-timestamp">
+                ✓ Revue générée le {horodatage}
+            </div>
         </aside>
     </div>
 </body>
@@ -582,11 +717,13 @@ def generer_html(articles_par_categorie):
 
 def main():
     """Fonction principale."""
-    print("\n" + "="*50)
-    print("🗞️  REVUE DE PRESSE AUTOMATISÉE")
-    print("="*50)
+    print("\n" + "="*60)
+    print("🗞️  REVUE DE PRESSE QUOTIDIENNE - ÉDITION PRIORITAIRE")
+    print("="*60)
+    print(f"🕐 Exécution lancée le {obtenir_horodatage()}")
+    print("="*60)
     
-    print("\n📰 Récupération des articles...")
+    print("\n📰 Récupération des articles prioritaires...")
     articles = recuperer_articles()
     
     print("\n✏️  Génération du HTML...")
@@ -597,7 +734,8 @@ def main():
         with open("revue-de-presse.html", "w", encoding="utf-8") as f:
             f.write(html_content)
         print(f"\n✅ Succès! Revue mise à jour : {obtenir_date_francaise()}")
-        print("="*50)
+        print(f"🕐 Horodatage : {obtenir_horodatage()}")
+        print("="*60)
         exit(0)
     except Exception as e:
         print(f"\n❌ Erreur : {e}")
