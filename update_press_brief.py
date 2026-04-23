@@ -79,8 +79,8 @@ def filtrer_articles(articles, mots_cles_exclure=None):
     
     articles_filtres = []
     for article in articles:
-        titre = article.get("title", "").lower()
-        description = article.get("description", "").lower()
+        titre = (article.get("title") or "").lower()
+        description = (article.get("description") or "").lower()
         
         # Vérifier si c'est du contenu à exclure
         est_exclu = any(mot in titre or mot in description for mot in mots_cles_exclure)
@@ -226,7 +226,7 @@ def recuperer_articles():
             titres_vus = set()
             articles_uniques = []
             for article in articles_par_categorie[categorie]:
-                titre = article.get("title", "").lower()
+                titre = (article.get("title") or "").lower()
                 if titre not in titres_vus:
                     articles_uniques.append(article)
                     titres_vus.add(titre)
