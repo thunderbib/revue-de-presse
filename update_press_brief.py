@@ -81,11 +81,11 @@ def recuperer_articles():
     
     # Configuration des requêtes par catégorie
     requetes = {
-        "quebec": "Montreal OR Quebec OR (Ville de Quebec)",
-        "canada": "Canada OR Ottawa OR Parliament",
-        "usa": "United States OR Washington OR White House OR Congress",
-        "economy": "economy OR markets OR business OR trading",
-        "geopolitics": "international OR geopolitics OR UN OR diplomacy"
+        "quebec": "(Quebec province) OR (Ville de Quebec)",
+        "canada": "Canada or (Canada politic)",
+        "usa": "United States politic",
+        "economy": "economy OR business",
+        "geopolitics": "international OR (world geopolitics)"
     }
     
     date_hier = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
